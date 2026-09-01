@@ -1,0 +1,31 @@
+# Rehearsal overlay (M5-T1 network split). Join rehearsal_net only.
+#
+# remnawave-network is the live RC/sandbox network — it is not the rehearsal
+# network. Do not invent staging-host-cabinet.
+#
+# Prefer remnabot1 docker-compose.rehearsal.yml (container rehearsal_cabinet_frontend)
+# for the isolated stack. Use this overlay only if cabinet is started from this
+# repo against rehearsal_net.
+#
+# Do not `up` this file in M5-T1. Do not start rehearsal_bot from here.
+#
+# Usage (do not run in M5-T1):
+#   docker compose -p rehearsal -f docker-compose.yml -f docker-compose.rehearsal.yml up -d
+
+services:
+  cabinet-frontend:
+    container_name: rehearsal_cabinet_frontend
+    build:
+      args:
+        VITE_API_URL: /api
+        VITE_TELEGRAM_BOT_USERNAME: ${VITE_TELEGRAM_BOT_USERNAME:-mrj7_bot}
+        VITE_APP_NAME: ${VITE_APP_NAME:-Rehearsal Cabinet}
+    ports:
+      - '127.0.0.1:3021:80'
+    networks:
+      - rehearsal_net
+
+networks:
+  rehearsal_net:
+    name: rehearsal_net
+    external: true
