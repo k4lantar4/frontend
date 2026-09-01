@@ -20,7 +20,7 @@ const LANG_CURRENCY_MAP: Record<
   ru: { currency: 'RUB', locale: 'ru-RU', symbol: '₽' },
   en: { currency: 'USD', locale: 'en-US', symbol: '$', key: 'USD' },
   zh: { currency: 'CNY', locale: 'zh-CN', symbol: '¥', key: 'CNY' },
-  fa: { currency: 'IRR', locale: 'fa-IR', symbol: '﷼', key: 'IRR' },
+  fa: { currency: 'IRR', locale: 'fa-IR-u-nu-latn', symbol: '﷼', key: 'IRR' },
 };
 
 const DEFAULT_CURRENCY = { currency: 'RUB', locale: 'ru-RU', symbol: '₽' };
@@ -34,6 +34,23 @@ export function setExchangeRates(rates: ExchangeRates | null): void {
   cachedExchangeRates = rates;
 }
 
+function languageBase(lang?: string): string {
+  return (lang || i18next.language || 'ru').split('-')[0].toLowerCase();
+}
+
+/** fa/ru amounts are already display units (Toman 1:1 / RUB). Do not apply layer-3 FX. */
+export function shouldSkipFxConversion(lang?: string): boolean {
+  const base = languageBase(lang);
+  if (base === 'fa' || base === 'ru') {
+    return true;
+  }
+  try {
+    return import.meta.env.VITE_DISABLE_BALANCE_FX === 'true';
+  } catch {
+    return false;
+  }
+}
+
 export function formatPrice(kopeks: number, lang?: string): string {
   const resolvedLang = lang || i18next.language || 'ru';
   const config = LANG_CURRENCY_MAP[resolvedLang] || DEFAULT_CURRENCY;
@@ -41,7 +58,8 @@ export function formatPrice(kopeks: number, lang?: string): string {
 
   // Конвертация по курсу для не-рублёвых локалей. Без rates fallback на сырую сумму
   // (поведение до фикса), чтобы первый рендер до загрузки курсов не отдавал NaN.
-  if (config.key && cachedExchangeRates) {
+  // fa: stored catalog is Toman after ÷100 — skip RUB→IRR (M6-T5).
+  if (!shouldSkipFxConversion(resolvedLang) && config.key && cachedExchangeRates) {
     amount = currencyApi.convertFromRub(amount, config.key, cachedExchangeRates);
   }
 

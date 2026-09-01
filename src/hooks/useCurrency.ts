@@ -2,7 +2,10 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { currencyApi, type ExchangeRates } from '../api/currency';
-import { setExchangeRates as setGlobalExchangeRates } from '../utils/format';
+import {
+  setExchangeRates as setGlobalExchangeRates,
+  shouldSkipFxConversion,
+} from '../utils/format';
 
 // Map language to currency
 const LANGUAGE_CURRENCY_MAP: Record<string, keyof ExchangeRates | 'RUB'> = {
@@ -41,8 +44,10 @@ export function useCurrency() {
   const currentLanguage = i18n.language;
   const targetCurrency = LANGUAGE_CURRENCY_MAP[currentLanguage] || 'USD';
 
-  // Check if current language is Russian (no conversion needed)
+  // Russian: amounts are already display rubles. Persian: bot balance_rubles is
+  // already Toman 1:1 — do not apply RUB→IRR FX again (M6-T5).
   const isRussian = currentLanguage === 'ru';
+  const skipFxConversion = shouldSkipFxConversion(currentLanguage);
 
   // Get currency symbol from translations
   const currencySymbol = t('common.currency');
@@ -50,7 +55,10 @@ export function useCurrency() {
   // Format amount with currency conversion
   const formatAmount = useCallback(
     (rubAmount: number, decimals: number = 2): string => {
-      if (isRussian) {
+      if (skipFxConversion) {
+        if (languageBaseFa(currentLanguage)) {
+          return Math.round(rubAmount).toLocaleString('fa-IR-u-nu-latn');
+        }
         return rubAmount.toFixed(decimals);
       }
 
@@ -63,12 +71,12 @@ export function useCurrency() {
 
       // For IRR (Iranian Toman), use no decimals as amounts are large
       if (targetCurrency === 'IRR') {
-        return Math.round(convertedAmount).toLocaleString('fa-IR');
+        return Math.round(convertedAmount).toLocaleString('fa-IR-u-nu-latn');
       }
 
       return convertedAmount.toFixed(decimals);
     },
-    [isRussian, targetCurrency, exchangeRates],
+    [skipFxConversion, currentLanguage, targetCurrency, exchangeRates],
   );
 
   // Format amount with currency symbol
@@ -90,7 +98,7 @@ export function useCurrency() {
   // Get raw converted amount (for calculations)
   const convertAmount = useCallback(
     (rubAmount: number): number => {
-      if (isRussian) {
+      if (skipFxConversion) {
         return rubAmount;
       }
       return currencyApi.convertFromRub(
@@ -99,18 +107,18 @@ export function useCurrency() {
         exchangeRates,
       );
     },
-    [isRussian, targetCurrency, exchangeRates],
+    [skipFxConversion, targetCurrency, exchangeRates],
   );
 
   // Convert from user's currency back to rubles
   const convertToRub = useCallback(
     (amount: number): number => {
-      if (isRussian) {
+      if (skipFxConversion) {
         return amount;
       }
       return currencyApi.convertToRub(amount, targetCurrency as keyof ExchangeRates, exchangeRates);
     },
-    [isRussian, targetCurrency, exchangeRates],
+    [skipFxConversion, targetCurrency, exchangeRates],
   );
 
   return useMemo(
@@ -118,6 +126,7 @@ export function useCurrency() {
       exchangeRates,
       targetCurrency,
       isRussian,
+      skipFxConversion,
       currencySymbol,
       formatAmount,
       formatWithCurrency,
@@ -129,6 +138,7 @@ export function useCurrency() {
       exchangeRates,
       targetCurrency,
       isRussian,
+      skipFxConversion,
       currencySymbol,
       formatAmount,
       formatWithCurrency,
@@ -137,4 +147,8 @@ export function useCurrency() {
       convertToRub,
     ],
   );
+}
+
+function languageBaseFa(lang: string): boolean {
+  return lang.split('-')[0].toLowerCase() === 'fa';
 }
