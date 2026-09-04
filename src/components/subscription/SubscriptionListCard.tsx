@@ -60,10 +60,12 @@ function StatusBadge({
 
 export default function SubscriptionListCard({
   subscription,
+  isMultiTariff = false,
   onClick,
   connect,
 }: {
   subscription: SubscriptionListItem;
+  isMultiTariff?: boolean;
   onClick: () => void;
   /**
    * Подключение устройства прямо из карточки. Задаётся только на главной:
@@ -148,7 +150,7 @@ export default function SubscriptionListCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <span className="truncate text-base font-semibold" style={{ color: g.text }}>
-              {getSubscriptionDisplayLabel(subscription, t)}
+              {getSubscriptionDisplayLabel(subscription, t, isMultiTariff)}
             </span>
             <StatusBadge status={subscription.status} isTrial={isTrial} t={t} />
           </div>
