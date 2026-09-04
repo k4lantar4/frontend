@@ -5946,7 +5946,11 @@
     "browsePlans": "View plans and subscribe",
     "empty": "You have no subscriptions yet",
     "emptyDesc": "Choose a tariff to get started",
-    "title": "My subscriptions"
+    "title": "My subscriptions",
+    "searchPlaceholder": "Search: name on card, service, or ID",
+    "searchActive": "Search: {{query}}",
+    "searchNoResults": "No subscription matches this query",
+    "searchClear": "Clear search"
   },
   "footer": {
     "offer": "Public Offer",
