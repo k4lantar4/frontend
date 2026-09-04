@@ -75,11 +75,11 @@ export const HomeIcon = ({ className }: IconProps) => (
 );
 
 export const BackIcon = ({ className }: IconProps) => (
-  <PiArrowLeft className={cn('h-5 w-5', className)} />
+  <PiArrowLeft className={cn('h-5 w-5', 'rtl:scale-x-[-1]', className)} />
 );
 
 export const ChevronRightIcon = ({ className }: IconProps) => (
-  <PiCaretRight className={cn('h-5 w-5', className)} />
+  <PiCaretRight className={cn('h-5 w-5', 'rtl:scale-x-[-1]', className)} />
 );
 
 export const MenuIcon = ({ className }: IconProps) => (
