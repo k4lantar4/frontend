@@ -55,6 +55,7 @@ import { DeviceReductionSheet } from '../components/subscription/sheets/DeviceRe
 import { TrafficTopupSheet } from '../components/subscription/sheets/TrafficTopupSheet';
 import { ServerManagementSheet } from '../components/subscription/sheets/ServerManagementSheet';
 import { DeleteSubscriptionSheet } from '../components/subscription/sheets/DeleteSubscriptionSheet';
+import { ConfigDeliverySheet } from '../components/subscription/ConfigDeliverySheet';
 import { PageSkeleton, Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
 import { safeLocal } from '../utils/safeStorage';
 
@@ -213,6 +214,7 @@ export default function Subscription() {
   const { openLink, platform } = usePlatform();
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [configSheetOpen, setConfigSheetOpen] = useState(false);
   const [showDeleteSheet, setShowDeleteSheet] = useState(false);
   const destructiveConfirm = useDestructiveConfirm();
 
@@ -966,6 +968,23 @@ export default function Subscription() {
                   isUnlimited={isUnlimited}
                   compact
                 />
+                {usedGb === 0 && (
+                  <p className="mb-3 text-[11px] text-dark-50/40">
+                    {t('subscription.volumeEmptyHint')}
+                  </p>
+                )}
+              </div>
+
+              {/* ─── First-connect checklist ─── */}
+              <div className="mb-4 rounded-[14px] p-3 text-[12px] text-dark-50/70">
+                <div className="mb-1 font-semibold">
+                  {t('subscription.firstConnectChecklist.title')}
+                </div>
+                <ul className="list-disc space-y-1 ps-4">
+                  <li>{t('subscription.firstConnectChecklist.step1')}</li>
+                  <li>{t('subscription.firstConnectChecklist.step2')}</li>
+                  <li>{t('subscription.firstConnectChecklist.step3')}</li>
+                </ul>
               </div>
 
               {/* ─── Connect Device Button ─── */}
@@ -979,7 +998,7 @@ export default function Subscription() {
                       haptic.notification('error');
                       return;
                     }
-                    navigate(subscriptionId ? `/connection?sub=${subscriptionId}` : '/connection');
+                    setConfigSheetOpen(true);
                   }}
                   className={`mb-5 flex w-full items-center gap-3.5 rounded-[14px] p-3.5 text-left transition-shadow duration-300${isAtDeviceLimit ? 'cursor-not-allowed opacity-50' : ''}`}
                   style={{ fontFamily: 'inherit' }}
@@ -2094,6 +2113,14 @@ export default function Subscription() {
             </div>
           )}
         </div>
+      )}
+      {subscription && (
+        <ConfigDeliverySheet
+          open={configSheetOpen}
+          onClose={() => setConfigSheetOpen(false)}
+          configUrl={subscription.subscription_url}
+          subscriptionId={subscription.id}
+        />
       )}
     </div>
   );

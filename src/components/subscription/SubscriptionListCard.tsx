@@ -9,6 +9,7 @@ import { SubscriptionConnectFooter } from './SubscriptionConnectFooter';
 
 import { connectFooterState } from './connectFooterState';
 import { TrafficUsageText } from './TrafficUsageText';
+import { getSubscriptionDisplayLabel } from '../../utils/subscriptionDisplayLabel';
 
 function StatusBadge({
   status,
@@ -147,7 +148,7 @@ export default function SubscriptionListCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <span className="truncate text-base font-semibold" style={{ color: g.text }}>
-              {subscription.tariff_name || t('subscription.defaultName', 'Подписка')}
+              {getSubscriptionDisplayLabel(subscription, t)}
             </span>
             <StatusBadge status={subscription.status} isTrial={isTrial} t={t} />
           </div>
