@@ -294,7 +294,7 @@
     "showAll": "نمایش همه",
     "subscriptions": "اشتراک‌ها",
     "connectDevice": "راهنمای اتصال",
-    "devicesConnectedUnlimited": "{{count}} اتصال فعال",
+    "devicesConnectedUnlimited": "{{used}} اتصال فعال",
     "devicesOfMax": "{{used}} از {{max}}",
     "maxUsage": "حداکثر {{amount}}",
     "remaining": "باقی‌مانده",

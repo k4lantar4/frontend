@@ -43,4 +43,11 @@ describe('fa user terminology', () => {
     });
     expect(hits).toEqual([]);
   });
+
+  it('dashboard.devicesConnectedUnlimited uses {{used}} and not دستگاه', () => {
+    const faObj = fa as Record<string, Record<string, string>>;
+    const value = faObj.dashboard.devicesConnectedUnlimited;
+    expect(value).toContain('{{used}}');
+    expect(value).not.toContain('دستگاه');
+  });
 });
