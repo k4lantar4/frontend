@@ -39,8 +39,18 @@ const bodyWithSubId = (
 export const subscriptionApi = {
   // ── Multi-tariff endpoints ──────────────────────────────────────────
 
-  getSubscriptions: async (): Promise<SubscriptionsListResponse> => {
-    const response = await apiClient.get<SubscriptionsListResponse>('/cabinet/subscriptions');
+  getSubscriptions: async (params?: {
+    offset?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<SubscriptionsListResponse> => {
+    const response = await apiClient.get<SubscriptionsListResponse>('/cabinet/subscriptions', {
+      params: {
+        offset: params?.offset ?? 0,
+        limit: params?.limit ?? 20,
+        ...(params?.search ? { search: params.search } : {}),
+      },
+    });
     return response.data;
   },
 

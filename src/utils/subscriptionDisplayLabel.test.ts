@@ -18,4 +18,14 @@ describe('getSubscriptionDisplayLabel', () => {
       getSubscriptionDisplayLabel({ tariff_name: 'Moon', panel_username: 'mobile_x_1001' }, t),
     ).toBe('mobile_x_1001');
   });
+
+  it('falls back to tariff #seq in multi-tariff', () => {
+    expect(
+      getSubscriptionDisplayLabel(
+        { tariff_name: 'Moon', panel_username: null, account_sequence: 4 },
+        t,
+        true,
+      ),
+    ).toBe('Moon #4');
+  });
 });

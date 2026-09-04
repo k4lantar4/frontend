@@ -116,6 +116,8 @@ export interface SubscriptionListItem {
   status: string;
   tariff_id: number | null;
   tariff_name: string | null;
+  account_sequence?: number;
+  panel_username?: string | null;
   traffic_limit_gb: number;
   traffic_used_gb: number;
   device_limit: number;
@@ -127,12 +129,15 @@ export interface SubscriptionListItem {
   is_daily_paused?: boolean;
   autopay_enabled: boolean;
   connected_squads: string[] | null;
+  purchase_note?: string | null;
+  user_disabled?: boolean;
 }
 
 // Response from GET /cabinet/subscriptions (multi-tariff)
 export interface SubscriptionsListResponse {
   subscriptions: SubscriptionListItem[];
   multi_tariff_enabled: boolean;
+  total?: number;
 }
 
 // Device types
