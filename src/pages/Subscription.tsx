@@ -10,7 +10,7 @@ import { useDestructiveConfirm } from '../platform/hooks/useNativeDialog';
 import TrafficProgressBar from '../components/dashboard/TrafficProgressBar';
 import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
 import { useTrafficZone } from '../hooks/useTrafficZone';
-import { formatTraffic } from '../utils/formatTraffic';
+import { TrafficUsageText } from '../components/subscription/TrafficUsageText';
 import { getGlassColors } from '../utils/glassTheme';
 import { copyToClipboard } from '../utils/clipboard';
 import { useTheme } from '../hooks/useTheme';
@@ -932,9 +932,11 @@ export default function Subscription() {
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[11px] text-dark-50/30">
-                      {isUnlimited
-                        ? formatTraffic(usedGb)
-                        : `${formatTraffic(usedGb)} / ${formatTraffic(subscription.traffic_limit_gb)}`}
+                      <TrafficUsageText
+                        usedGb={usedGb}
+                        limitGb={subscription.traffic_limit_gb}
+                        isUnlimited={isUnlimited}
+                      />
                     </span>
                     <button
                       onClick={() => refreshTrafficMutation.mutate()}
@@ -1059,7 +1061,7 @@ export default function Subscription() {
               {displayedConnectionUrl && !shouldHideConnectionLink && (
                 <div className="mb-5 flex gap-2">
                   <code
-                    className="block min-w-0 flex-1 truncate whitespace-nowrap rounded-[10px] px-3 py-2 font-mono text-[11px] text-dark-50/30"
+                    className="url-ltr block min-w-0 flex-1 truncate whitespace-nowrap rounded-[10px] px-3 py-2 font-mono text-[11px] text-dark-50/30"
                     style={{
                       background: g.codeBg,
                       border: `1px solid ${g.codeBorder}`,

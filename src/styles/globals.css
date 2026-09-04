@@ -413,6 +413,13 @@ img.twemoji {
 }
 
 @layer components {
+  /* URL / deep-link fields in RTL (fa) UI — show https:// start, not the tail */
+  .url-ltr {
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: isolate;
+  }
+
   /* ========== BENTO DESIGN SYSTEM ========== */
 
   .bento-card {

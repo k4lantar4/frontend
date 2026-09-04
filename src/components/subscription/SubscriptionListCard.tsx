@@ -8,6 +8,7 @@ import { formatUserDate } from '../../utils/formatDate';
 import { SubscriptionConnectFooter } from './SubscriptionConnectFooter';
 
 import { connectFooterState } from './connectFooterState';
+import { TrafficUsageText } from './TrafficUsageText';
 
 function StatusBadge({
   status,
@@ -161,9 +162,11 @@ export default function SubscriptionListCard({
                 {t('subscription.traffic', 'Трафик')}
               </span>
               <span className="text-[11px] tabular-nums" style={{ color: g.textSecondary }}>
-                {isUnlimited
-                  ? '∞'
-                  : `${trafficUsed.toFixed(1)} / ${trafficLimit} ${t('common.units.gb', 'ГБ')}`}
+                {isUnlimited ? (
+                  '∞'
+                ) : (
+                  <TrafficUsageText usedGb={trafficUsed} limitGb={trafficLimit} />
+                )}
               </span>
             </div>
             {!isUnlimited && (
