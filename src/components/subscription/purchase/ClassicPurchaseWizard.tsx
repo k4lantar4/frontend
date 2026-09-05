@@ -11,6 +11,7 @@ import { getGlassColors } from '../../../utils/glassTheme';
 import { getErrorMessage, type PurchaseStep } from '../../../utils/subscriptionHelpers';
 import { CheckIcon } from '../../icons';
 import InsufficientBalancePrompt from '../../InsufficientBalancePrompt';
+import { formatPeriodLabel } from '../../../utils/periodLabels';
 import Twemoji from 'react-twemoji';
 import { Skeleton, SkeletonGroup } from '../../ui/skeleton';
 import type {
@@ -293,7 +294,9 @@ export function ClassicPurchaseWizard({
                         -{promoPeriod.percent}%
                       </div>
                     )}
-                    <div className="text-lg font-semibold text-dark-100">{period.label}</div>
+                    <div className="text-lg font-semibold text-dark-100">
+                      {formatPeriodLabel(period.period_days, t)}
+                    </div>
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span className="font-medium text-accent-400">
                         {formatPrice(promoPeriod.price)}

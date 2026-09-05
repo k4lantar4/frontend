@@ -31,6 +31,7 @@ import { cn } from '../lib/utils';
 import { getApiErrorMessage } from '../utils/api-error';
 import { getPendingCampaignSlug } from '../utils/campaign';
 import { readContactPrefill, stripContactFromUrl } from '../utils/contactPrefill';
+import { formatPeriodLabel } from '../utils/periodLabels';
 import { formatPrice } from '../utils/format';
 import { setFavicon, letterFaviconDataUri, roundedFaviconDataUri } from '../utils/favicon';
 import { useCurrency } from '../hooks/useCurrency';
@@ -48,22 +49,6 @@ function isValidContact(value: string): boolean {
     return trimmed.length >= 4;
   }
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
-}
-
-function formatPeriodLabel(
-  days: number,
-  t: (key: string, options?: Record<string, unknown>) => string,
-): string {
-  const key = `landing.periodLabels.d${days}`;
-  const result = t(key);
-  if (result !== key) return result;
-
-  const months = Math.floor(days / 30);
-  const remainder = days % 30;
-  if (months > 0 && remainder === 0) {
-    return t('landing.periodLabels.nMonths', { count: months });
-  }
-  return t('landing.periodLabels.nDays', { count: days });
 }
 
 function LoadingSkeleton() {

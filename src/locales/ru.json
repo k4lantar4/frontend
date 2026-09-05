@@ -459,6 +459,7 @@
     "from": "от",
     "month": "мес",
     "insufficientBalance": "Недостаточно средств. Не хватает {{missing}} ₽",
+    "insufficientBalanceAmount": "Недостаточно средств. Не хватает {{missing}}",
     "trial": {
       "title": "Бесплатный пробный период",
       "titlePaid": "Пробная подписка",

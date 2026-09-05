@@ -543,6 +543,7 @@
     "devicesFree": "کاربر رایگان",
     "from": "از",
     "month": "ماه",
+    "insufficientBalanceAmount": "موجودی ناکافی. کسری {{missing}}",
     "myDevices": "اتصال‌های فعال",
     "noDevices": "هیچ اتصال فعالی نیست",
     "renameDevice": "تغییر نام",

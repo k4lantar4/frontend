@@ -446,7 +446,8 @@
     "currentTariff": "Current",
     "from": "from",
     "month": "mo",
-    "insufficientBalance": "Insufficient balance. Missing {{missing}} ₽",
+    "insufficientBalance": "Insufficient balance. Missing {{missing}}",
+    "insufficientBalanceAmount": "Insufficient funds. Missing {{missing}}",
     "trial": {
       "title": "Free Trial",
       "titlePaid": "Trial Subscription",
