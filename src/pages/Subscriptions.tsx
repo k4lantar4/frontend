@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -81,7 +81,7 @@ export default function Subscriptions() {
     refetchOnMount: 'always',
   });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ['subscriptions-list', offset, PAGE_LIMIT, debouncedSearch],
     queryFn: () =>
       subscriptionApi.getSubscriptions({
@@ -91,6 +91,7 @@ export default function Subscriptions() {
       }),
     staleTime: 30_000,
     refetchOnMount: 'always',
+    placeholderData: keepPreviousData,
   });
 
   const subscriptions = data?.subscriptions ?? [];
@@ -105,7 +106,7 @@ export default function Subscriptions() {
     (s) => !s.is_trial && (s.status === 'active' || s.status === 'limited'),
   );
 
-  const showSearch = accountTotal >= 2 && !isLoading;
+  const showSearch = accountTotal >= 2;
   const totalPages = Math.ceil(total / PAGE_LIMIT) || 1;
   const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
 
@@ -299,7 +300,10 @@ export default function Subscriptions() {
 
       {/* Subscription grid */}
       {subscriptions.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:[&>*:last-child:nth-child(odd)]:col-span-2">
+        <div
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:[&>*:last-child:nth-child(odd)]:col-span-2"
+          style={{ opacity: isFetching && !isLoading ? 0.7 : 1 }}
+        >
           {subscriptions.map((sub) => (
             <SubscriptionListCard
               key={sub.id}
