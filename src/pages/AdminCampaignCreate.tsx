@@ -4,10 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   campaignsApi,
-  CampaignCreateRequest,
-  CampaignBonusType,
-  ServerSquadInfo,
-  TariffListItem,
+  type CampaignCreateRequest,
+  type CampaignBonusType,
+  type ServerSquadInfo,
+  type TariffListItem,
 } from '../api/campaigns';
 import { partnerApi } from '../api/partners';
 import { AdminBackButton } from '../components/admin';
@@ -230,7 +230,9 @@ export default function AdminCampaignCreate() {
     };
 
     if (bonusType === 'balance') {
-      data.balance_bonus_kopeks = Math.round(toNumber(balanceBonusRubles) * 100);
+      // balance_bonus_kopeks is a raw Toman amount (backend credits it 1:1
+      // post-Phase-B) despite the legacy "kopeks" name — don't scale it here.
+      data.balance_bonus_kopeks = Math.round(toNumber(balanceBonusRubles));
     } else if (bonusType === 'subscription') {
       data.subscription_duration_days = toNumber(subscriptionDays, 7);
       data.subscription_traffic_gb = toNumber(subscriptionTraffic, 10);

@@ -102,10 +102,8 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <div className="text-sm font-semibold text-success-400">
             {campaign.bonus_type === 'balance' &&
               t('referral.partner.campaignBonus.balanceDesc', {
-                amount: formatWithCurrency(
-                  campaign.balance_bonus_kopeks / PARTNER_STATS.KOPEKS_DIVISOR,
-                  0,
-                ),
+                // balance_bonus_kopeks is a raw Toman amount, not kopeks — no divisor.
+                amount: formatWithCurrency(campaign.balance_bonus_kopeks, 0),
               })}
             {campaign.bonus_type === 'subscription' &&
               t('referral.partner.campaignBonus.subscriptionDesc', {

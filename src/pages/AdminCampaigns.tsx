@@ -55,11 +55,13 @@ const bonusTypeConfig: Record<
 const localeMap: Record<string, string> = { ru: 'ru-RU', en: 'en-US', zh: 'zh-CN', fa: 'fa-IR' };
 
 // Format number as rubles
-const formatRubles = (kopeks: number) => {
+const formatRubles = (kopeks: number, divisor: 100 | 1 = 100) => {
   const locale = localeMap[i18n.language] || 'ru-RU';
   return (
-    (kopeks / 100).toLocaleString(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }) +
-    ' ₽'
+    (kopeks / divisor).toLocaleString(locale, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }) + ' ₽'
   );
 };
 
@@ -167,7 +169,10 @@ export default function AdminCampaigns() {
           />
           <StatCard
             label={t('admin.campaigns.overview.bonusesIssued')}
-            value={formatRubles(overview.total_balance_issued_kopeks)}
+            // total_balance_issued_kopeks is a raw Toman amount post-Phase-B, not
+            // kopeks — divisor=1 (unlike total_revenue_kopeks below, which is real
+            // catalog/revenue kopek-scale).
+            value={formatRubles(overview.total_balance_issued_kopeks, 1)}
             icon={<BanknotesIcon className="h-5 w-5" />}
             tone="success"
           />
