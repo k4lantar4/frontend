@@ -1,0 +1,25 @@
+# RC cabinet overlay for panel.rookari.com (M5-T1).
+#
+# Join remnawave-network only — that is where Caddy and remnawave_bot live.
+# Do not join rehearsal_net (M1-T1) or bot_bot_network.
+# Do not invent staging-host-cabinet. Public RC hostname is panel.rookari.com.
+#
+# Usage (from /opt/cabinet):
+#   docker compose -f docker-compose.yml -f docker-compose.rc.yml up -d
+#
+# Isolated rehearsal cabinet stays in remnabot1 docker-compose.rehearsal.yml
+# on rehearsal_net. Do not start rehearsal_bot from this overlay.
+
+services:
+  cabinet-frontend:
+    build:
+      args:
+        VITE_API_URL: /api
+        VITE_TELEGRAM_BOT_USERNAME: ${VITE_TELEGRAM_BOT_USERNAME:-mrj7_bot}
+    networks:
+      - remnawave-network
+
+networks:
+  remnawave-network:
+    name: remnawave-network
+    external: true

@@ -10,6 +10,8 @@ import { dailyPriceQuote } from './dailyPrice';
 import { usePlatform } from '../../../platform';
 import { openPaymentUrl } from '../../../utils/openPaymentUrl';
 import { getMonthlyPriceKopeks } from '../../../utils/pricing';
+import { missingToman, userCanAfford } from '../../../utils/catalogScale';
+import { formatPeriodLabel } from '../../../utils/periodLabels';
 import InsufficientBalancePrompt from '../../InsufficientBalancePrompt';
 import type { Tariff, TariffPeriod } from '../../../types';
 import { BestValueBadge } from '../BestValueBadge';
@@ -277,13 +279,15 @@ export function TariffPurchaseForm({
 
           {(() => {
             const dailyPrice = dailyQuote?.price ?? 0;
-            const hasEnoughBalance = balanceKopeks !== undefined && dailyPrice <= balanceKopeks;
+            const hasEnoughBalance =
+              balanceKopeks !== undefined && userCanAfford(balanceKopeks, dailyPrice);
 
             return (
               <div className="mt-6">
                 {balanceKopeks !== undefined && !hasEnoughBalance && (
                   <InsufficientBalancePrompt
-                    missingAmountKopeks={dailyPrice - balanceKopeks}
+                    missingAmountKopeks={missingToman(balanceKopeks, dailyPrice)}
+                    amountScale="toman"
                     compact
                     className="mb-4"
                   />
@@ -321,8 +325,9 @@ export function TariffPurchaseForm({
                       <InsufficientBalancePrompt
                         missingAmountKopeks={
                           getInsufficientBalanceError(purchaseMutation.error)?.missingAmount ||
-                          dailyPrice - (balanceKopeks || 0)
+                          missingToman(balanceKopeks || 0, dailyPrice)
                         }
+                        amountScale="toman"
                         compact
                       />
                     </div>
@@ -373,7 +378,9 @@ export function TariffPurchaseForm({
                           -{displayDiscount}%
                         </div>
                       )}
-                      <div className="text-lg font-semibold text-dark-100">{period.label}</div>
+                      <div className="text-lg font-semibold text-dark-100">
+                        {formatPeriodLabel(period.days, t)}
+                      </div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-accent-400">
                           {formatPrice(displayPrice)}
@@ -651,7 +658,8 @@ export function TariffPurchaseForm({
                               <>
                                 <div className="flex justify-between text-sm text-dark-300">
                                   <span>
-                                    {t('subscription.baseTariff')}: {selectedTariffPeriod.label}
+                                    {t('subscription.baseTariff')}:{' '}
+                                    {formatPeriodLabel(selectedTariffPeriod.days, t)}
                                   </span>
                                   <span>
                                     {formatPrice(selectedTariffPeriod.base_tariff_price_kopeks)}
@@ -674,7 +682,7 @@ export function TariffPurchaseForm({
                               <div className="flex justify-between text-sm text-dark-300">
                                 <span>
                                   {t('subscription.summary.period', {
-                                    label: selectedTariffPeriod.label,
+                                    label: formatPeriodLabel(selectedTariffPeriod.days, t),
                                   })}
                                 </span>
                                 <div className="flex items-center gap-2">
@@ -753,6 +761,7 @@ export function TariffPurchaseForm({
                     missingAmountKopeks={
                       getInsufficientBalanceError(purchaseMutation.error)?.missingAmount || 0
                     }
+                    amountScale="toman"
                     compact
                   />
                 </div>

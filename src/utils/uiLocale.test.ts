@@ -13,7 +13,7 @@ describe('uiLocale', () => {
     await i18next.changeLanguage('zh');
     expect(uiLocale()).toBe('zh-CN');
     await i18next.changeLanguage('fa');
-    expect(uiLocale()).toBe('fa-IR');
+    expect(uiLocale()).toBe('fa-IR-u-ca-persian-nu-latn');
   });
 
   it('режет региональный суффикс языка', async () => {
@@ -32,5 +32,13 @@ describe('uiLocale', () => {
     expect(date.toLocaleDateString(uiLocale(), { timeZone: 'UTC' })).toBe('7/13/2026');
     await i18next.changeLanguage('ru');
     expect(date.toLocaleDateString(uiLocale(), { timeZone: 'UTC' })).toBe('13.07.2026');
+  });
+
+  it('fa dates use Persian calendar with Latin digits', async () => {
+    await i18next.changeLanguage('fa');
+    const date = new Date('2026-07-09T12:00:00Z');
+    const rendered = date.toLocaleDateString(uiLocale(), { timeZone: 'UTC' });
+    expect(rendered).toMatch(/1405/);
+    expect(rendered).not.toMatch(/[۰-۹]/);
   });
 });

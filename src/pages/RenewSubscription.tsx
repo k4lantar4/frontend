@@ -6,6 +6,7 @@ import { subscriptionApi } from '../api/subscription';
 import { useTheme } from '../hooks/useTheme';
 import { getGlassColors } from '../utils/glassTheme';
 import { getMonthlyPriceKopeks } from '../utils/pricing';
+import { missingToman, userCanAfford } from '../utils/catalogScale';
 import { useCurrency } from '../hooks/useCurrency';
 import { useHaptic } from '../platform';
 import InsufficientBalancePrompt from '../components/InsufficientBalancePrompt';
@@ -130,7 +131,7 @@ export default function RenewSubscription() {
           {t('common.balance', 'Баланс')}
         </span>
         <span className="text-base font-semibold" style={{ color: g.text }}>
-          {formatAmount(balanceKopeks / 100)} {currencySymbol}
+          {formatAmount(balanceKopeks)} {currencySymbol}
         </span>
       </div>
 
@@ -148,7 +149,7 @@ export default function RenewSubscription() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {options.map((option) => {
             const isSelected = selectedPeriod === option.period_days;
-            const canAfford = balanceKopeks >= option.price_kopeks;
+            const canAfford = userCanAfford(balanceKopeks, option.price_kopeks);
             const perMonth = getMonthlyPriceKopeks(option.price_kopeks, option.period_days);
             // Выбранный вариант важнее подсказки: рамка выделения уступает
             // рамке выбора, чтобы не было двух «активных» карточек сразу.
@@ -215,7 +216,7 @@ export default function RenewSubscription() {
                       'subscription.insufficientBalanceAmount',
                       'Недостаточно средств. Не хватает {{missing}}',
                       {
-                        missing: `${formatAmount((option.price_kopeks - balanceKopeks) / 100)} ${currencySymbol}`,
+                        missing: `${formatAmount(missingToman(balanceKopeks, option.price_kopeks))} ${currencySymbol}`,
                       },
                     )}
                   </div>
@@ -227,7 +228,13 @@ export default function RenewSubscription() {
       )}
 
       {/* Insufficient balance prompt */}
-      {missingAmount && <InsufficientBalancePrompt missingAmountKopeks={missingAmount} compact />}
+      {missingAmount && (
+        <InsufficientBalancePrompt
+          missingAmountKopeks={missingAmount}
+          amountScale="toman"
+          compact
+        />
+      )}
 
       {/* Error */}
       {error && !missingAmount && (

@@ -30,6 +30,8 @@ export interface TariffPickerGridProps {
   purchaseOptions: PurchaseOptions | undefined;
   isTariffsMode: boolean;
   isMultiTariff: boolean;
+  /** When `new`, show purchase labels and skip legacy/renew branches. */
+  purchaseIntent?: 'new' | 'renew';
   onSelectTariff: (tariff: Tariff) => void;
   onSwitchTariff: (tariffId: number) => void;
 }
@@ -40,6 +42,7 @@ export function TariffPickerGrid({
   purchaseOptions,
   isTariffsMode,
   isMultiTariff,
+  purchaseIntent,
   onSelectTariff,
   onSwitchTariff,
 }: TariffPickerGridProps) {
@@ -54,6 +57,7 @@ export function TariffPickerGrid({
     kopeks === 0
       ? t('subscription.free', 'Бесплатно')
       : `${formatAmount(kopeks / 100)} ${currencySymbol}`;
+  const isNewPurchase = purchaseIntent === 'new';
 
   return (
     <>
@@ -89,7 +93,8 @@ export function TariffPickerGrid({
       )}
 
       {/* Tariff Grid */}
-      {isMultiTariff &&
+      {!isNewPurchase &&
+        isMultiTariff &&
         purchaseOptions &&
         'all_tariffs_purchased' in purchaseOptions &&
         purchaseOptions.all_tariffs_purchased && (
@@ -118,8 +123,8 @@ export function TariffPickerGrid({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[...tariffs]
           .filter((tariff) => {
-            // In multi-tariff mode: hide already purchased tariffs
-            if (isMultiTariff && tariff.is_purchased) return false;
+            // In multi-tariff mode: hide already purchased tariffs (not for intent=new)
+            if (!isNewPurchase && isMultiTariff && tariff.is_purchased) return false;
             if (subscription?.is_trial && tariff.name.toLowerCase().includes('trial')) {
               return false;
             }
@@ -133,8 +138,10 @@ export function TariffPickerGrid({
             return 0;
           })
           .map((tariff) => {
-            const isCurrentTariff = tariff.is_current || tariff.id === subscription?.tariff_id;
+            const isCurrentTariff =
+              !isNewPurchase && (tariff.is_current || tariff.id === subscription?.tariff_id);
             const isSubscriptionExpired =
+              !isNewPurchase &&
               isTariffsMode &&
               purchaseOptions &&
               'subscription_is_expired' in purchaseOptions &&
@@ -147,6 +154,7 @@ export function TariffPickerGrid({
               'subscription_on_free_tariff' in purchaseOptions &&
               purchaseOptions.subscription_on_free_tariff === true;
             const canSwitch =
+              !isNewPurchase &&
               !isMultiTariff &&
               subscription &&
               subscription.tariff_id &&
@@ -156,7 +164,7 @@ export function TariffPickerGrid({
               !isOnFreeTariff &&
               (subscription.is_active || subscription.is_limited);
             const isLegacySubscription =
-              subscription && !subscription.is_trial && !subscription.tariff_id;
+              !isNewPurchase && subscription && !subscription.is_trial && !subscription.tariff_id;
 
             return (
               <div
@@ -278,7 +286,14 @@ export function TariffPickerGrid({
 
                 {/* Action Buttons */}
                 <div className="mt-4 flex gap-2">
-                  {isCurrentTariff ? (
+                  {isNewPurchase ? (
+                    <button
+                      onClick={() => onSelectTariff(tariff)}
+                      className="btn-primary flex-1 py-2 text-sm"
+                    >
+                      {t('subscription.buyNewAccount', 'خرید اکانت جدید')}
+                    </button>
+                  ) : isCurrentTariff ? (
                     subscription?.is_daily ? (
                       <div className="flex-1 py-2 text-center text-sm text-dark-500">
                         {t('subscription.currentTariff')}

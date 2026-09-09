@@ -79,6 +79,7 @@ function SortablePrizeCard({
   isLoading,
 }: SortablePrizeCardProps) {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: prize.id,
   });
@@ -127,7 +128,8 @@ function SortablePrizeCard({
           <div className="truncate font-semibold text-dark-100">{prize.display_name}</div>
           <div className="truncate text-xs text-dark-400 sm:text-sm">
             {t(`admin.wheel.prizes.types.${prize.prize_type}`)} •{' '}
-            {(prize.prize_value_kopeks / 100).toFixed(0)}₽
+            {(prize.prize_value_kopeks / 100).toFixed(0)}
+            {currencySymbol}
           </div>
         </div>
 
@@ -964,6 +966,7 @@ function InlinePrizeForm({
   isLoading?: boolean;
 }) {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const [formData, setFormData] = useState<{
     prize_type: string;
     prize_value: number | '';
@@ -1095,7 +1098,7 @@ function InlinePrizeForm({
             className="input w-full"
           />
           <p className="mt-1 text-xs text-dark-500">
-            = {(toNumber(formData.prize_value_kopeks) / 100).toFixed(2)} RUB
+            = {(toNumber(formData.prize_value_kopeks) / 100).toFixed(2)} {currencySymbol}
           </p>
         </div>
 

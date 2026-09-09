@@ -2,7 +2,7 @@ import { uiLocale } from '@/utils/uiLocale';
 import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useParams } from 'react-router';
+import { Link, Navigate, useNavigate, useParams } from 'react-router';
 import { subscriptionApi } from '../api/subscription';
 import { DEVICE_ALIAS_MAX_LENGTH } from '../constants/devices';
 import { WebBackButton } from '../components/WebBackButton';
@@ -10,7 +10,9 @@ import { useDestructiveConfirm } from '../platform/hooks/useNativeDialog';
 import TrafficProgressBar from '../components/dashboard/TrafficProgressBar';
 import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
 import { useTrafficZone } from '../hooks/useTrafficZone';
-import { formatTraffic } from '../utils/formatTraffic';
+import { getSubscriptionDisplayLabel } from '../utils/subscriptionDisplayLabel';
+import { NEW_PURCHASE_PATH } from '../components/subscription/purchase/purchaseRoutes';
+import { TrafficUsageText } from '../components/subscription/TrafficUsageText';
 import { getGlassColors } from '../utils/glassTheme';
 import { copyToClipboard } from '../utils/clipboard';
 import { useTheme } from '../hooks/useTheme';
@@ -55,6 +57,7 @@ import { DeviceReductionSheet } from '../components/subscription/sheets/DeviceRe
 import { TrafficTopupSheet } from '../components/subscription/sheets/TrafficTopupSheet';
 import { ServerManagementSheet } from '../components/subscription/sheets/ServerManagementSheet';
 import { DeleteSubscriptionSheet } from '../components/subscription/sheets/DeleteSubscriptionSheet';
+import { ConfigDeliverySheet } from '../components/subscription/ConfigDeliverySheet';
 import { PageSkeleton, Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
 import { safeLocal } from '../utils/safeStorage';
 
@@ -214,6 +217,8 @@ export default function Subscription() {
   const { openLink, platform } = usePlatform();
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [copiedUsername, setCopiedUsername] = useState(false);
+  const [configSheetOpen, setConfigSheetOpen] = useState(false);
   const [showDeleteSheet, setShowDeleteSheet] = useState(false);
   const destructiveConfirm = useDestructiveConfirm();
 
@@ -251,6 +256,23 @@ export default function Subscription() {
     staleTime: 60_000,
   });
   const isMultiTariff = multiSubData?.multi_tariff_enabled ?? false;
+  const currentListItem = useMemo(() => {
+    if (!isMultiTariff || !multiSubData?.subscriptions || !subscriptionId) return null;
+    return multiSubData.subscriptions.find((s) => s.id === subscriptionId) ?? null;
+  }, [isMultiTariff, multiSubData?.subscriptions, subscriptionId]);
+
+  const { data: listItemFallback } = useQuery({
+    queryKey: ['subscription-list-item', subscriptionId],
+    queryFn: () => {
+      if (subscriptionId == null) {
+        return Promise.reject(new Error('subscriptionId required'));
+      }
+      return subscriptionApi.getSubscriptionById(subscriptionId);
+    },
+    enabled: isMultiTariff && !!subscriptionId && !currentListItem,
+    staleTime: 60_000,
+  });
+  const listIdentity = currentListItem ?? listItemFallback ?? null;
 
   const { data: subscriptionResponse, isLoading } = useQuery({
     queryKey: ['subscription', subscriptionId],
@@ -268,6 +290,22 @@ export default function Subscription() {
 
   // Extract subscription from response (null if no subscription)
   const subscription = subscriptionResponse?.subscription ?? null;
+  const usernameLabel = useMemo(() => {
+    if (!subscription) return null;
+    return getSubscriptionDisplayLabel(
+      {
+        tariff_name: subscription.tariff_name,
+        panel_username: listIdentity?.panel_username,
+        account_sequence: listIdentity?.account_sequence,
+      },
+      t,
+      isMultiTariff,
+    );
+  }, [subscription, listIdentity, t, isMultiTariff]);
+  const isRealPanelUsername = useMemo(() => {
+    const panel = (listIdentity?.panel_username ?? '').trim();
+    return !!panel && !panel.startsWith('user_unknown_');
+  }, [listIdentity]);
   const displayedConnectionUrl = useMemo(
     () =>
       resolveConnectionUrlForUi({
@@ -647,6 +685,13 @@ export default function Subscription() {
     }
   };
 
+  const copyUsername = () => {
+    if (!isRealPanelUsername || !usernameLabel) return;
+    void copyToClipboard(usernameLabel);
+    setCopiedUsername(true);
+    setTimeout(() => setCopiedUsername(false), 2000);
+  };
+
   const handleRevoke = async () => {
     const confirmed = await destructiveConfirm(
       t('subscription.revoke.warning'),
@@ -696,11 +741,29 @@ export default function Subscription() {
       {/* Page title */}
       <div className="flex items-center gap-3">
         <WebBackButton to={isMultiTariff ? '/subscriptions' : '/'} />
-        <h1 className="text-2xl font-bold text-dark-50 sm:text-3xl">
-          {isMultiTariff && subscription?.tariff_name
-            ? subscription.tariff_name
-            : t('subscription.title')}
-        </h1>
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <h1 className="truncate text-2xl font-bold text-dark-50 sm:text-3xl">
+            {isMultiTariff && usernameLabel ? usernameLabel : t('subscription.title')}
+          </h1>
+          {isMultiTariff && isRealPanelUsername && (
+            <button
+              type="button"
+              onClick={copyUsername}
+              className="flex h-9 shrink-0 items-center rounded-[10px] px-2.5 transition-colors duration-300"
+              style={{
+                background: copiedUsername ? 'rgba(var(--color-accent-400), 0.12)' : g.innerBorder,
+                border: copiedUsername
+                  ? '1px solid rgba(var(--color-accent-400), 0.2)'
+                  : `1px solid ${g.trackBg}`,
+                color: copiedUsername ? 'rgb(var(--color-accent-400))' : g.textMuted,
+              }}
+              aria-label={t('subscription.copyUsername', 'کپی یوزرنیم')}
+              title={t('subscription.copyUsername', 'کپی یوزرنیم')}
+            >
+              {copiedUsername ? <CheckIcon /> : <CopyIcon />}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Current Subscription */}
@@ -712,6 +775,12 @@ export default function Subscription() {
           const connectedDevices = devicesData?.total ?? 0;
           const isAtDeviceLimit =
             subscription.device_limit > 0 && connectedDevices >= subscription.device_limit;
+          const showFirstConnectChecklist =
+            subscription.is_active &&
+            !subscription.is_limited &&
+            usedGb === 0 &&
+            !shouldHideConnectionLink &&
+            !!displayedConnectionUrl;
 
           return (
             <div
@@ -933,9 +1002,11 @@ export default function Subscription() {
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[11px] text-dark-400">
-                      {isUnlimited
-                        ? formatTraffic(usedGb)
-                        : `${formatTraffic(usedGb)} / ${formatTraffic(subscription.traffic_limit_gb)}`}
+                      <TrafficUsageText
+                        usedGb={usedGb}
+                        limitGb={subscription.traffic_limit_gb}
+                        isUnlimited={isUnlimited}
+                      />
                     </span>
                     <button
                       onClick={() => refreshTrafficMutation.mutate()}
@@ -965,6 +1036,11 @@ export default function Subscription() {
                   isUnlimited={isUnlimited}
                   compact
                 />
+                {usedGb === 0 && (
+                  <p className="mb-3 text-[11px] text-dark-400">
+                    {t('subscription.volumeEmptyHint')}
+                  </p>
+                )}
               </div>
 
               {/* ─── Connect Device Button ─── */}
@@ -1056,11 +1132,77 @@ export default function Subscription() {
                 </HoverBorderGradient>
               )}
 
+              {/* ─── First-connect checklist ─── */}
+              {showFirstConnectChecklist && (
+                <div className="mb-4 rounded-[14px] p-3 text-[12px] text-dark-50/70">
+                  <div className="mb-1 font-semibold">
+                    {t('subscription.firstConnectChecklist.title')}
+                  </div>
+                  <ul className="list-disc space-y-1 ps-4">
+                    <li>{t('subscription.firstConnectChecklist.step1')}</li>
+                    <li>{t('subscription.firstConnectChecklist.step2')}</li>
+                    <li>{t('subscription.firstConnectChecklist.step3')}</li>
+                  </ul>
+                </div>
+              )}
+
+              {/* ─── Config delivery + connection guide ─── */}
+              {subscription.subscription_url &&
+                !shouldHideConnectionLink &&
+                displayedConnectionUrl && (
+                  <div className="mb-5 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      disabled={isAtDeviceLimit}
+                      onClick={() => {
+                        if (isAtDeviceLimit) {
+                          haptic.notification('error');
+                          return;
+                        }
+                        setConfigSheetOpen(true);
+                      }}
+                      className={`flex items-center justify-center gap-2 rounded-[14px] px-3 py-3.5 text-sm font-semibold text-dark-50 transition-colors ${
+                        isAtDeviceLimit ? 'cursor-not-allowed opacity-50' : ''
+                      }`}
+                      style={{
+                        background: `${zone.mainHex}12`,
+                        border: `1px solid ${zone.mainHex}30`,
+                        color: zone.mainHex,
+                      }}
+                    >
+                      {t('subscription.configDelivery.getConfig')}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isAtDeviceLimit}
+                      onClick={() => {
+                        if (isAtDeviceLimit) {
+                          haptic.notification('error');
+                          return;
+                        }
+                        navigate(
+                          subscriptionId ? `/connection?sub=${subscriptionId}` : '/connection',
+                        );
+                      }}
+                      className={`flex items-center justify-center gap-2 rounded-[14px] border px-3 py-3.5 text-sm font-semibold transition-colors ${
+                        isAtDeviceLimit ? 'cursor-not-allowed opacity-50' : ''
+                      }`}
+                      style={{
+                        background: g.innerBg,
+                        borderColor: g.innerBorder,
+                        color: g.text,
+                      }}
+                    >
+                      {t('subscription.configDelivery.openGuide')}
+                    </button>
+                  </div>
+                )}
+
               {/* ─── Subscription URL ─── */}
               {displayedConnectionUrl && !shouldHideConnectionLink && (
                 <div className="mb-5 flex gap-2">
                   <code
-                    className="block min-w-0 flex-1 truncate whitespace-nowrap rounded-[10px] px-3 py-2 font-mono text-[11px] text-dark-400"
+                    className="url-ltr block min-w-0 flex-1 truncate whitespace-nowrap rounded-[10px] px-3 py-2 font-mono text-[11px] text-dark-400"
                     style={{
                       background: g.codeBg,
                       border: `1px solid ${g.codeBorder}`,
@@ -1697,11 +1839,12 @@ export default function Subscription() {
           </div>
         )}
 
-      {/* Additional Options (Buy Devices) */}
+      {/* Additional Options */}
       {subscription &&
-        (subscription.is_active || subscription.is_limited) &&
         !subscription.is_trial &&
-        subscription.device_limit !== 0 && (
+        (isMultiTariff ||
+          ((subscription.is_active || subscription.is_limited) &&
+            subscription.device_limit !== 0)) && (
           <div
             className="relative overflow-hidden rounded-3xl"
             style={{
@@ -1715,66 +1858,80 @@ export default function Subscription() {
               {t('subscription.additionalOptions.title')}
             </h2>
 
-            {/* Buy Devices */}
-            <DeviceTopupSheet
-              open={showDeviceTopup}
-              onOpen={() => setShowDeviceTopup(true)}
-              onClose={() => setShowDeviceTopup(false)}
-              subscription={subscription}
-              subscriptionId={subscriptionId}
-              devicesToAdd={devicesToAdd}
-              onDevicesToAddChange={setDevicesToAdd}
-              purchaseOptions={purchaseOptions}
-              isDark={isDark}
-            />
-
-            {/* Reduce Devices */}
-            <div className="mt-4">
-              <DeviceReductionSheet
-                open={showDeviceReduction}
-                onOpen={() => setShowDeviceReduction(true)}
-                onClose={() => setShowDeviceReduction(false)}
-                subscriptionPresent={!!subscription}
-                subscriptionId={subscriptionId}
-                targetDeviceLimit={targetDeviceLimit}
-                onTargetDeviceLimitChange={setTargetDeviceLimit}
-                isDark={isDark}
-              />
-            </div>
-
-            {/* Buy Traffic */}
-            {subscription.traffic_limit_gb > 0 && (
-              <div className="mt-4">
-                <TrafficTopupSheet
-                  open={showTrafficTopup}
-                  onOpen={() => setShowTrafficTopup(true)}
-                  onClose={() => setShowTrafficTopup(false)}
-                  subscription={subscription}
-                  subscriptionId={subscriptionId}
-                  selectedTrafficPackage={selectedTrafficPackage}
-                  onSelectedTrafficPackageChange={setSelectedTrafficPackage}
-                  purchaseOptions={purchaseOptions}
-                  isDark={isDark}
-                />
-              </div>
+            {isMultiTariff && (
+              <Link
+                to={NEW_PURCHASE_PATH}
+                className="mb-4 block w-full rounded-xl border p-4 text-start"
+              >
+                <div className="font-medium">+ {t('subscriptions.buyAnother')}</div>
+              </Link>
             )}
 
-            {/* Server Management - only in classic mode */}
-            {!isTariffsMode && (
-              <div className="mt-4">
-                <ServerManagementSheet
-                  open={showServerManagement}
-                  onOpen={() => setShowServerManagement(true)}
-                  onClose={() => setShowServerManagement(false)}
-                  subscription={subscription}
-                  subscriptionId={subscriptionId}
-                  selectedServers={selectedServersToUpdate}
-                  onSelectedServersChange={setSelectedServersToUpdate}
-                  purchaseOptions={purchaseOptions}
-                  isDark={isDark}
-                />
-              </div>
-            )}
+            {(subscription.is_active || subscription.is_limited) &&
+              subscription.device_limit !== 0 && (
+                <>
+                  {/* Buy Devices */}
+                  <DeviceTopupSheet
+                    open={showDeviceTopup}
+                    onOpen={() => setShowDeviceTopup(true)}
+                    onClose={() => setShowDeviceTopup(false)}
+                    subscription={subscription}
+                    subscriptionId={subscriptionId}
+                    devicesToAdd={devicesToAdd}
+                    onDevicesToAddChange={setDevicesToAdd}
+                    purchaseOptions={purchaseOptions}
+                    isDark={isDark}
+                  />
+
+                  {/* Reduce Devices */}
+                  <div className="mt-4">
+                    <DeviceReductionSheet
+                      open={showDeviceReduction}
+                      onOpen={() => setShowDeviceReduction(true)}
+                      onClose={() => setShowDeviceReduction(false)}
+                      subscriptionPresent={!!subscription}
+                      subscriptionId={subscriptionId}
+                      targetDeviceLimit={targetDeviceLimit}
+                      onTargetDeviceLimitChange={setTargetDeviceLimit}
+                      isDark={isDark}
+                    />
+                  </div>
+
+                  {/* Buy Traffic */}
+                  {subscription.traffic_limit_gb > 0 && (
+                    <div className="mt-4">
+                      <TrafficTopupSheet
+                        open={showTrafficTopup}
+                        onOpen={() => setShowTrafficTopup(true)}
+                        onClose={() => setShowTrafficTopup(false)}
+                        subscription={subscription}
+                        subscriptionId={subscriptionId}
+                        selectedTrafficPackage={selectedTrafficPackage}
+                        onSelectedTrafficPackageChange={setSelectedTrafficPackage}
+                        purchaseOptions={purchaseOptions}
+                        isDark={isDark}
+                      />
+                    </div>
+                  )}
+
+                  {/* Server Management - only in classic mode */}
+                  {!isTariffsMode && (
+                    <div className="mt-4">
+                      <ServerManagementSheet
+                        open={showServerManagement}
+                        onOpen={() => setShowServerManagement(true)}
+                        onClose={() => setShowServerManagement(false)}
+                        subscription={subscription}
+                        subscriptionId={subscriptionId}
+                        selectedServers={selectedServersToUpdate}
+                        onSelectedServersChange={setSelectedServersToUpdate}
+                        purchaseOptions={purchaseOptions}
+                        isDark={isDark}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
           </div>
         )}
 
@@ -2093,6 +2250,14 @@ export default function Subscription() {
             </div>
           )}
         </div>
+      )}
+      {subscription && (
+        <ConfigDeliverySheet
+          open={configSheetOpen}
+          onClose={() => setConfigSheetOpen(false)}
+          configUrl={subscription.subscription_url}
+          subscriptionId={subscription.id}
+        />
       )}
     </div>
   );

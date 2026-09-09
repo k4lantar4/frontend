@@ -5955,7 +5955,11 @@
     "browsePlans": "查看套餐并订阅",
     "empty": "您还没有订阅",
     "emptyDesc": "选择套餐以开始使用",
-    "title": "我的订阅"
+    "title": "我的订阅",
+    "searchPlaceholder": "搜索：卡片名称、套餐或 ID",
+    "searchActive": "搜索：{{query}}",
+    "searchNoResults": "未找到匹配的订阅",
+    "searchClear": "清除搜索"
   },
   "footer": {
     "offer": "公开要约",

@@ -21,6 +21,7 @@ import { promoApi } from '../api/promo';
 import PendingGiftCard from '../components/dashboard/PendingGiftCard';
 import SubscriptionListCard from '../components/subscription/SubscriptionListCard';
 import { DeviceLimitSheet } from '../components/subscription/DeviceLimitSheet';
+import { NEW_PURCHASE_PATH } from '../components/subscription/purchase/purchaseRoutes';
 import { API } from '../config/constants';
 import { ChevronRightIcon, StarIcon } from '@/components/icons';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
@@ -331,6 +332,7 @@ export default function Dashboard() {
             <SubscriptionListCard
               key={sub.id}
               subscription={sub}
+              isMultiTariff={isMultiTariff}
               onClick={() => navigate(`/subscriptions/${sub.id}`)}
               connect={{
                 connectedDevices: deviceQueries[index]?.data?.total,
@@ -349,7 +351,7 @@ export default function Dashboard() {
           )}
           {hasActivePaid ? (
             <Link
-              to="/subscription/purchase"
+              to={NEW_PURCHASE_PATH}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-500/15 p-3.5 text-sm font-medium text-accent-400 transition-all hover:bg-accent-500/25"
             >
               <span className="text-base">+</span>{' '}
@@ -357,7 +359,7 @@ export default function Dashboard() {
             </Link>
           ) : (
             <Link
-              to="/subscription/purchase"
+              to={NEW_PURCHASE_PATH}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-500 p-3.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-600"
             >
               <span className="text-base">+</span>{' '}
@@ -417,7 +419,7 @@ export default function Dashboard() {
             />
           )}
           <Link
-            to="/subscription/purchase"
+            to={NEW_PURCHASE_PATH}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent-500 p-3.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-600"
           >
             <span className="text-base">+</span>{' '}

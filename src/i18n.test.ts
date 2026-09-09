@@ -25,7 +25,7 @@ describe('готовность словарей', () => {
 
     await i18nReady;
 
-    expect(i18n.hasResourceBundle('ru', 'translation')).toBe(true);
+    expect(i18n.hasResourceBundle('fa', 'translation')).toBe(true);
     // Ключи с картинки из репорта.
     for (const key of ['auth.login', 'auth.email', 'auth.password', 'common.or']) {
       expect(i18n.t(key)).not.toBe(key);

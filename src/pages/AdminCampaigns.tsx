@@ -20,6 +20,7 @@ import {
 import { StatCard } from '../components/stats';
 import { usePlatform } from '../platform/hooks/usePlatform';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useCurrency } from '../hooks/useCurrency';
 import { Skeleton, SkeletonGroup } from '../components/ui/skeleton';
 
 const PAGE_SIZE = 50;
@@ -54,18 +55,23 @@ const bonusTypeConfig: Record<
 // Locale mapping for formatting
 const localeMap: Record<string, string> = { ru: 'ru-RU', en: 'en-US', zh: 'zh-CN', fa: 'fa-IR' };
 
-// Format number as rubles
-const formatRubles = (kopeks: number) => {
+// Format a money amount in the active currency
+const formatMoney = (kopeks: number, currencySymbol: string, divisor: 100 | 1 = 100) => {
   const locale = localeMap[i18n.language] || 'ru-RU';
   return (
-    (kopeks / 100).toLocaleString(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }) +
-    ' ₽'
+    (kopeks / divisor).toLocaleString(locale, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }) +
+    ' ' +
+    currencySymbol
   );
 };
 
 // Main Component
 export default function AdminCampaigns() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { capabilities } = usePlatform();
@@ -167,7 +173,10 @@ export default function AdminCampaigns() {
           />
           <StatCard
             label={t('admin.campaigns.overview.bonusesIssued')}
-            value={formatRubles(overview.total_balance_issued_kopeks)}
+            // total_balance_issued_kopeks is a raw Toman amount post-Phase-B, not
+            // kopeks — divisor=1 (unlike total_revenue_kopeks below, which is real
+            // catalog/revenue kopek-scale).
+            value={formatMoney(overview.total_balance_issued_kopeks, currencySymbol, 1)}
             icon={<BanknotesIcon className="h-5 w-5" />}
             tone="success"
           />
@@ -221,7 +230,7 @@ export default function AdminCampaigns() {
                     </span>
                     <span>
                       {t('admin.campaigns.table.revenue', {
-                        amount: formatRubles(campaign.total_revenue_kopeks),
+                        amount: formatMoney(campaign.total_revenue_kopeks, currencySymbol),
                       })}
                     </span>
                     <span>

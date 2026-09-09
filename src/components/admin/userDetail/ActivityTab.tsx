@@ -18,6 +18,8 @@ import {
   WheelIcon,
 } from '@/components/icons';
 import { StatCard } from '@/components/stats';
+import { uiLocale } from '@/utils/uiLocale';
+import { useCurrency } from '@/hooks/useCurrency';
 
 // ──────────────────────────────────────────────────────────────────
 // Activity tab — unified timeline of the user's actions in the bot
@@ -97,6 +99,7 @@ function SubtypeBadge({ subtype }: { subtype: string }) {
 }
 
 function AmountChip({ item }: { item: UserActivityItem }) {
+  const { currencySymbol } = useCurrency();
   if (item.amount_kopeks == null || item.amount_kopeks === 0) return null;
 
   const rubles = Math.abs(item.amount_kopeks) / 100;
@@ -110,7 +113,7 @@ function AmountChip({ item }: { item: UserActivityItem }) {
   return (
     <span className={`shrink-0 text-sm font-semibold tabular-nums ${tone}`}>
       {sign}
-      {rubles.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽
+      {rubles.toLocaleString(uiLocale(), { maximumFractionDigits: 2 })} {currencySymbol}
     </span>
   );
 }

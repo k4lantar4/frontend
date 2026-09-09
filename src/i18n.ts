@@ -11,7 +11,10 @@ const localeLoaders: Record<string, () => Promise<{ default: ResourceLanguage }>
 };
 
 const SUPPORTED_LANGS = Object.keys(localeLoaders);
-const FALLBACK_LNG = 'ru';
+/** Deployment default — matches bot DEFAULT_LANGUAGE (fa). */
+const DEFAULT_LNG = 'fa';
+/** A missing fa key must fall through to English, never raw Russian. */
+const FALLBACK_LNG = 'en';
 const LANGUAGE_STORAGE_KEY = 'cabinet_language';
 
 const loadedLanguages = new Set<string>();
@@ -31,12 +34,13 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: FALLBACK_LNG,
+    lng: DEFAULT_LNG,
+    fallbackLng: [DEFAULT_LNG, FALLBACK_LNG, 'en'],
     supportedLngs: SUPPORTED_LANGS,
     partialBundledLanguages: true,
 
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       caches: ['localStorage'],
       lookupLocalStorage: 'cabinet_language',
     },
@@ -53,8 +57,12 @@ i18n
   });
 
 // Load detected language + fallback on startup
-const detectedLng = i18n.language?.split('-')[0] || FALLBACK_LNG;
-const langsToLoad = [FALLBACK_LNG, ...(detectedLng !== FALLBACK_LNG ? [detectedLng] : [])];
+const detectedLng = i18n.language?.split('-')[0] || DEFAULT_LNG;
+const langsToLoad = [
+  DEFAULT_LNG,
+  FALLBACK_LNG,
+  ...(detectedLng !== DEFAULT_LNG && detectedLng !== FALLBACK_LNG ? [detectedLng] : []),
+];
 
 // Сколько ждать словари, прежде чем рисовать без них. Белый экран хуже
 // непереведённого текста: если чанк локали не приехал (сеть отвалилась, прокси
@@ -79,7 +87,7 @@ export const i18nReady: Promise<void> = Promise.race([
 
 // Keep <html lang> + dir in sync with i18n so screen readers pronounce
 // content correctly, browsers don't offer to translate it, and RTL
-// languages (fa) flip layout direction. index.html ships with lang="ru"
+// languages (fa) flip layout direction. index.html ships with lang="fa"
 // for the first paint; runtime updates take over from there.
 const RTL_LANGS = new Set(['fa', 'ar', 'he', 'ur']);
 function syncHtmlLang(lng: string): void {

@@ -4,21 +4,12 @@ import { getGlassColors } from '../../utils/glassTheme';
 import { useHaptic } from '../../platform';
 import { CalendarIcon, CheckIcon, ChevronRightIcon, DevicesIcon } from '@/components/icons';
 import type { SubscriptionListItem } from '../../types';
-import { connectFooterState } from './connectFooterState';
+import { formatUserDate } from '../../utils/formatDate';
 import { SubscriptionConnectFooter } from './SubscriptionConnectFooter';
 
-function formatDate(iso: string | null, locale?: string): string {
-  if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleDateString(locale ?? undefined, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  } catch {
-    return '—';
-  }
-}
+import { connectFooterState } from './connectFooterState';
+import { TrafficUsageText } from './TrafficUsageText';
+import { getSubscriptionDisplayLabel } from '../../utils/subscriptionDisplayLabel';
 
 function StatusBadge({
   status,
@@ -73,10 +64,12 @@ function StatusBadge({
 
 export default function SubscriptionListCard({
   subscription,
+  isMultiTariff = false,
   onClick,
   connect,
 }: {
   subscription: SubscriptionListItem;
+  isMultiTariff?: boolean;
   onClick: () => void;
   /**
    * Подключение устройства прямо из карточки. Задаётся только на главной:
@@ -161,7 +154,7 @@ export default function SubscriptionListCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <span className="truncate text-base font-semibold" style={{ color: g.text }}>
-              {subscription.tariff_name || t('subscription.defaultName', 'Подписка')}
+              {getSubscriptionDisplayLabel(subscription, t, isMultiTariff)}
             </span>
             <StatusBadge status={subscription.status} isTrial={isTrial} t={t} />
           </div>
@@ -176,9 +169,11 @@ export default function SubscriptionListCard({
                 {t('subscription.traffic', 'Трафик')}
               </span>
               <span className="text-[11px] tabular-nums" style={{ color: g.textSecondary }}>
-                {isUnlimited
-                  ? '∞'
-                  : `${trafficUsed.toFixed(1)} / ${trafficLimit} ${t('common.units.gb', 'ГБ')}`}
+                {isUnlimited ? (
+                  '∞'
+                ) : (
+                  <TrafficUsageText usedGb={trafficUsed} limitGb={trafficLimit} />
+                )}
               </span>
             </div>
             {!isUnlimited && (
@@ -205,7 +200,7 @@ export default function SubscriptionListCard({
           )}
           <span className="flex items-center gap-1">
             <CalendarIcon className="h-3.5 w-3.5 opacity-50" />
-            {formatDate(subscription.end_date, i18n.language)}
+            {formatUserDate(subscription.end_date, i18n.language)}
           </span>
           {!isTrial &&
             (() => {

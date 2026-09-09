@@ -454,7 +454,8 @@
     "currentTariff": "Current",
     "from": "from",
     "month": "mo",
-    "insufficientBalance": "Insufficient balance. Missing {{missing}} ₽",
+    "insufficientBalance": "Insufficient balance. Missing {{missing}}",
+    "insufficientBalanceAmount": "Insufficient funds. Missing {{missing}}",
     "trial": {
       "title": "Free Trial",
       "titlePaid": "Trial Subscription",
@@ -6484,7 +6485,11 @@
     "browsePlans": "View plans and subscribe",
     "empty": "You have no subscriptions yet",
     "emptyDesc": "Choose a tariff to get started",
-    "title": "My subscriptions"
+    "title": "My subscriptions",
+    "searchPlaceholder": "Search: name on card, service, or ID",
+    "searchActive": "Search: {{query}}",
+    "searchNoResults": "No subscription matches this query",
+    "searchClear": "Clear search"
   },
   "footer": {
     "offer": "Public Offer",

@@ -156,7 +156,8 @@ export default function AdminPromocodeCreate() {
 
   const handleSubmit = () => {
     // For discount: balance_bonus_kopeks = percent (integer), subscription_days = hours
-    // For balance: balance_bonus_kopeks = rubles * 100
+    // For balance: balance_bonus_kopeks is a raw Toman amount (backend credits it 1:1
+    // post-Phase-B) despite the legacy "kopeks" name — don't scale it here.
     const balanceValue = balanceBonusRubles === '' ? 0 : balanceBonusRubles;
     const daysValue = subscriptionDays === '' ? 0 : subscriptionDays;
     const maxUsesValue = maxUses === '' ? 0 : maxUses;
@@ -169,7 +170,7 @@ export default function AdminPromocodeCreate() {
         mode === 'discount'
           ? Math.round(balanceValue) // percent as integer
           : mode === 'bonus_set' && includeBalance
-            ? Math.round(balanceValue * 100) // rubles to kopeks
+            ? Math.round(balanceValue) // already Toman, no scaling
             : 0,
       subscription_days:
         mode === 'discount' ||

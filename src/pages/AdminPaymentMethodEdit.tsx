@@ -11,6 +11,7 @@ import { useHapticFeedback } from '../platform/hooks/useHaptic';
 import { useDestructiveConfirm } from '../platform/hooks/useNativeDialog';
 import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
 import { localeMap } from '../utils/withdrawalUtils';
+import { useCurrency } from '../hooks/useCurrency';
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { BackIcon, CheckIcon, SaveIcon } from '@/components/icons';
 import { PageSkeleton, Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
@@ -213,6 +214,7 @@ function OverpayCertificateSection() {
 
 export default function AdminPaymentMethodEdit() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const { methodId } = useParams<{ methodId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -582,7 +584,9 @@ export default function AdminPaymentMethodEdit() {
                   aria-label={t('admin.paymentMethods.quickAmountsRemove', { value })}
                   className="flex items-center gap-1.5 rounded-xl border border-accent-500/30 bg-accent-500/10 px-3 py-1.5 text-sm font-medium text-accent-300 transition-colors hover:border-error-500/40 hover:bg-error-500/10 hover:text-error-400"
                 >
-                  <span>{value} ₽</span>
+                  <span>
+                    {value} {currencySymbol}
+                  </span>
                   <span className="text-base leading-none">×</span>
                 </button>
               ))}

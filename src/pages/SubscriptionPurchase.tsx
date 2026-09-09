@@ -14,6 +14,7 @@ import { TariffPickerGrid } from '../components/subscription/purchase/TariffPick
 import { ClassicPurchaseWizard } from '../components/subscription/purchase/ClassicPurchaseWizard';
 import { ExclamationIcon, SparklesIcon } from '@/components/icons';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
+import { isNewPurchaseIntent } from '../components/subscription/purchase/purchaseRoutes';
 
 export default function SubscriptionPurchase() {
   const { t } = useTranslation();
@@ -21,18 +22,21 @@ export default function SubscriptionPurchase() {
   const subscriptionId = searchParams.get('subscriptionId')
     ? parseInt(searchParams.get('subscriptionId')!, 10)
     : undefined;
+  const isNewPurchase = isNewPurchaseIntent(searchParams);
+  const effectiveSubscriptionId = isNewPurchase ? undefined : subscriptionId;
   const { isDark } = useTheme();
   const g = getGlassColors(isDark);
 
   // Subscription query (shares cache with /subscription page)
   const { data: subscriptionResponse, isLoading } = useQuery({
-    queryKey: ['subscription', subscriptionId],
-    queryFn: () => subscriptionApi.getSubscription(subscriptionId),
+    queryKey: ['subscription', effectiveSubscriptionId],
+    queryFn: () => subscriptionApi.getSubscription(effectiveSubscriptionId),
     retry: false,
     staleTime: 0,
     refetchOnMount: 'always',
+    enabled: !isNewPurchase || effectiveSubscriptionId != null,
   });
-  const subscription = subscriptionResponse?.subscription ?? null;
+  const subscription = isNewPurchase ? null : (subscriptionResponse?.subscription ?? null);
 
   // Purchase options
   const {
@@ -41,8 +45,8 @@ export default function SubscriptionPurchase() {
     isError: optionsError,
     refetch: refetchOptions,
   } = useQuery({
-    queryKey: ['purchase-options', subscriptionId],
-    queryFn: () => subscriptionApi.getPurchaseOptions(subscriptionId),
+    queryKey: ['purchase-options', effectiveSubscriptionId, isNewPurchase],
+    queryFn: () => subscriptionApi.getPurchaseOptions(effectiveSubscriptionId),
     staleTime: 0,
     refetchOnMount: 'always',
   });
@@ -140,7 +144,7 @@ export default function SubscriptionPurchase() {
           to={subscriptionId ? `/subscriptions/${subscriptionId}` : '/subscriptions'}
         />
         <h1 className="text-2xl font-bold text-dark-50 sm:text-3xl">
-          {isMultiTariff && !subscriptionId
+          {isNewPurchase || (isMultiTariff && !subscriptionId)
             ? t('subscription.newTariff', 'Новый тариф')
             : !isMultiTariff && subscription?.is_daily && !subscription?.is_trial
               ? t('subscription.switchTariff.title')
@@ -240,7 +244,7 @@ export default function SubscriptionPurchase() {
             )}
 
           {/* Legacy subscription notice */}
-          {subscription && !subscription.is_trial && !subscription.tariff_id && (
+          {!isNewPurchase && subscription && !subscription.is_trial && !subscription.tariff_id && (
             <div className="mb-6 rounded-xl border border-accent-500/30 bg-accent-500/10 p-4">
               <div className="mb-2 font-medium text-accent-400">
                 {t('subscription.legacy.selectTariffTitle')}
@@ -274,6 +278,7 @@ export default function SubscriptionPurchase() {
               purchaseOptions={purchaseOptions}
               isTariffsMode={isTariffsMode}
               isMultiTariff={isMultiTariff}
+              purchaseIntent={isNewPurchase ? 'new' : 'renew'}
               onSelectTariff={(tariff) => {
                 setSelectedTariff(tariff);
                 setShowTariffPurchase(true);
@@ -286,7 +291,7 @@ export default function SubscriptionPurchase() {
               <TariffPurchaseForm
                 key={selectedTariff.id}
                 tariff={selectedTariff}
-                subscriptionId={subscriptionId}
+                subscriptionId={effectiveSubscriptionId}
                 balanceKopeks={purchaseOptions?.balance_kopeks}
                 sbpPurchaseEnabled={
                   isTariffsMode &&

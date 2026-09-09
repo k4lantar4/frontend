@@ -287,7 +287,11 @@ export default function AdminCampaignStats() {
               </div>
               {stats.bonus_type === 'balance' && (
                 <div className="text-lg font-medium text-success-400">
-                  {formatWithCurrency(stats.balance_issued_kopeks / PARTNER_STATS.KOPEKS_DIVISOR)}
+                  {/* balance_issued_kopeks is a raw Toman amount post-Phase-B, not
+                      kopeks — use the already-unscaled _rubles field instead of
+                      dividing by KOPEKS_DIVISOR (that only applies to real
+                      catalog/revenue kopek-scale fields on this page). */}
+                  {formatWithCurrency(stats.balance_issued_rubles)}
                 </div>
               )}
               {stats.bonus_type === 'subscription' && (
