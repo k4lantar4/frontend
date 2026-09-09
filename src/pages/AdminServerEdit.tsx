@@ -9,9 +9,11 @@ import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
 import Twemoji from 'react-twemoji';
 import { getFlagEmoji as getCountryFlag } from '../utils/subscriptionHelpers';
 import { PageSkeleton, Skeleton } from '../components/ui/skeleton';
+import { useCurrency } from '../hooks/useCurrency';
 
 export default function AdminServerEdit() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -223,7 +225,7 @@ export default function AdminServerEdit() {
                 min={0}
                 step={1}
               />
-              <span className="text-dark-400">₽</span>
+              <span className="text-dark-400">{currencySymbol}</span>
             </div>
             <p className="mt-1 text-xs text-dark-500">{t('admin.servers.priceHint')}</p>
           </div>

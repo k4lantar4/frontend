@@ -7,6 +7,7 @@ import { ServerIcon, UsersIcon, CheckIcon, XIcon, BanknotesIcon } from '../compo
 import { StatCard } from '@/components/stats';
 import Twemoji from 'react-twemoji';
 import { getFlagEmoji } from '../utils/subscriptionHelpers';
+import { useCurrency } from '../hooks/useCurrency';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
 
 // Country flag helper. Алгоритмический ISO 3166-1 alpha-2 → regional indicator,
@@ -16,6 +17,7 @@ const getCountryFlag = (code: string | null | undefined): string => getFlagEmoji
 
 export default function AdminRemnawaveSquadDetail() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
 
@@ -151,7 +153,7 @@ export default function AdminRemnawaveSquadDetail() {
               />
               <StatCard
                 label={t('admin.remnawave.squads.price', 'Price')}
-                value={`${((squad.price_kopeks ?? 0) / 100).toFixed(0)} ₽`}
+                value={`${((squad.price_kopeks ?? 0) / 100).toFixed(0)} ${currencySymbol}`}
                 icon={<BanknotesIcon className="h-5 w-5" />}
                 tone="neutral"
               />

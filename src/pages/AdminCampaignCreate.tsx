@@ -12,6 +12,7 @@ import {
 import { partnerApi } from '../api/partners';
 import { AdminBackButton } from '../components/admin';
 import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
+import { useCurrency } from '../hooks/useCurrency';
 import Twemoji from 'react-twemoji';
 import { CampaignIcon, CheckIcon, LinkIcon, RefreshIcon } from '@/components/icons';
 
@@ -146,6 +147,7 @@ function slugify(text: string): string {
 
 export default function AdminCampaignCreate() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
@@ -405,7 +407,7 @@ export default function AdminCampaignCreate() {
               min={0}
               step={1}
             />
-            <span className="text-dark-300">₽</span>
+            <span className="text-dark-300">{currencySymbol}</span>
           </div>
         </div>
       )}

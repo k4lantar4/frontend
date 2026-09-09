@@ -10,6 +10,7 @@ import {
 } from '@/components/icons';
 import type { NetworkGraphData } from '@/types/referralNetwork';
 import { formatKopeksToRubles } from '../utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface NetworkStatsProps {
   data: NetworkGraphData;
@@ -18,6 +19,7 @@ interface NetworkStatsProps {
 
 export function NetworkStats({ data, className }: NetworkStatsProps) {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
 
   return (
     <div
@@ -44,14 +46,14 @@ export function NetworkStats({ data, className }: NetworkStatsProps) {
         />
         <StatCard
           label={t('admin.referralNetwork.stats.subscriptionRevenue')}
-          value={`${formatKopeksToRubles(data.total_subscription_revenue_kopeks)} ₽`}
+          value={`${formatKopeksToRubles(data.total_subscription_revenue_kopeks)} ${currencySymbol}`}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="accent"
         />
         <div className="col-span-2">
           <StatCard
             label={t('admin.referralNetwork.stats.totalEarnings')}
-            value={`${formatKopeksToRubles(data.total_earnings_kopeks)} ₽`}
+            value={`${formatKopeksToRubles(data.total_earnings_kopeks)} ${currencySymbol}`}
             icon={<WalletIcon className="h-5 w-5" />}
             tone="neutral"
           />

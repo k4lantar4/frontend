@@ -12,7 +12,8 @@ const localeLoaders: Record<string, () => Promise<{ default: ResourceLanguage }>
 const SUPPORTED_LANGS = Object.keys(localeLoaders);
 /** Deployment default — matches bot DEFAULT_LANGUAGE (fa). */
 const DEFAULT_LNG = 'fa';
-const FALLBACK_LNG = 'ru';
+/** A missing fa key must fall through to English, never raw Russian. */
+const FALLBACK_LNG = 'en';
 const LANGUAGE_STORAGE_KEY = 'cabinet_language';
 
 const loadedLanguages = new Set<string>();

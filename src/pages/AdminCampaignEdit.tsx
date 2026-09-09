@@ -13,6 +13,7 @@ import {
 import { AdminBackButton } from '../components/admin';
 import { CheckIcon, CampaignIcon } from '../components/icons';
 import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
+import { useCurrency } from '../hooks/useCurrency';
 import Twemoji from 'react-twemoji';
 import { PageSkeleton, Skeleton } from '../components/ui/skeleton';
 
@@ -177,6 +178,7 @@ function PartnerSelector({
 
 export default function AdminCampaignEdit() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -480,7 +482,7 @@ export default function AdminCampaignEdit() {
               min={0}
               step={1}
             />
-            <span className="text-dark-300">₽</span>
+            <span className="text-dark-300">{currencySymbol}</span>
           </div>
         </div>
       )}

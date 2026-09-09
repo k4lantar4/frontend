@@ -5,6 +5,7 @@ import { getErrorMessage } from '../../../utils/subscriptionHelpers';
 import InsufficientBalancePrompt from '../../InsufficientBalancePrompt';
 import { ChevronRightIcon } from '../../icons';
 import type { PurchaseOptions, Subscription } from '../../../types';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 // ──────────────────────────────────────────────────────────────────
 // Buy-traffic sheet. Self-owns the packages query + purchase mutation;
@@ -39,11 +40,14 @@ export function TrafficTopupSheet({
   isDark,
 }: TrafficTopupSheetProps) {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const queryClient = useQueryClient();
 
   const formatPrice = (kopeks: number) => {
     const rubles = kopeks / 100;
-    return rubles % 1 === 0 ? `${rubles} ₽` : `${rubles.toFixed(2)} ₽`;
+    return rubles % 1 === 0
+      ? `${rubles} ${currencySymbol}`
+      : `${rubles.toFixed(2)} ${currencySymbol}`;
   };
 
   const { data: trafficPackages } = useQuery({

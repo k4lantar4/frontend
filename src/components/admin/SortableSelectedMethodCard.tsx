@@ -163,7 +163,7 @@ export function SortableSelectedMethodCard({
               type="text"
               value={method.currency ?? ''}
               onChange={(e) => onUpdate(method.method_id, 'currency', e.target.value || null)}
-              placeholder="RUB"
+              placeholder="IRR"
               className="w-full rounded-lg border border-dark-700 bg-dark-800 px-3 py-1.5 text-sm text-dark-100 outline-none focus:border-accent-500"
             />
           </div>
