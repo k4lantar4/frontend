@@ -13,6 +13,7 @@ import {
 import { AdminBackButton } from '../components/admin';
 import { CheckIcon, CampaignIcon } from '../components/icons';
 import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
+import { useCurrency } from '../hooks/useCurrency';
 import Twemoji from 'react-twemoji';
 import { PageSkeleton, Skeleton } from '../components/ui/skeleton';
 
@@ -177,6 +178,7 @@ function PartnerSelector({
 
 export default function AdminCampaignEdit() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -242,7 +244,8 @@ export default function AdminCampaignEdit() {
       setStartParameter(campaign.start_parameter || '');
       setBonusType(campaign.bonus_type || 'balance');
       setIsActive(campaign.is_active ?? true);
-      setBalanceBonusRubles((campaign.balance_bonus_kopeks || 0) / 100);
+      // balance_bonus_kopeks is a raw Toman amount, not kopeks — no /100.
+      setBalanceBonusRubles(campaign.balance_bonus_kopeks || 0);
       setSubscriptionDays(campaign.subscription_duration_days || 7);
       setSubscriptionTraffic(campaign.subscription_traffic_gb || 10);
       setSubscriptionDevices(campaign.subscription_device_limit || 1);
@@ -284,7 +287,9 @@ export default function AdminCampaignEdit() {
     }
 
     if (bonusType === 'balance') {
-      data.balance_bonus_kopeks = Math.round(toNumber(balanceBonusRubles) * 100);
+      // balance_bonus_kopeks is a raw Toman amount despite the legacy "kopeks"
+      // name — don't scale it here.
+      data.balance_bonus_kopeks = Math.round(toNumber(balanceBonusRubles));
     } else if (bonusType === 'subscription') {
       data.subscription_duration_days = toNumber(subscriptionDays, 7);
       data.subscription_traffic_gb = toNumber(subscriptionTraffic, 10);
@@ -477,7 +482,7 @@ export default function AdminCampaignEdit() {
               min={0}
               step={1}
             />
-            <span className="text-dark-300">₽</span>
+            <span className="text-dark-300">{currencySymbol}</span>
           </div>
         </div>
       )}

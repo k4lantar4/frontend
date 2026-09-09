@@ -13,6 +13,7 @@ import {
 } from '../api/tariffs';
 import { AdminBackButton } from '../components/admin';
 import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
+import { useCurrency } from '../hooks/useCurrency';
 import Twemoji from 'react-twemoji';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
 import {
@@ -29,6 +30,7 @@ type TariffType = 'period' | 'daily' | null;
 
 export default function AdminTariffCreate() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
@@ -650,7 +652,7 @@ export default function AdminTariffCreate() {
                     step={1}
                     placeholder="0"
                   />
-                  <span className="text-dark-400">₽</span>
+                  <span className="text-dark-400">{currencySymbol}</span>
                   <div className="flex-1" />
                   <button
                     onClick={() => removePeriod(period.days)}
@@ -820,7 +822,7 @@ export default function AdminTariffCreate() {
                 step={1}
                 placeholder="0"
               />
-              <span className="text-dark-400">₽</span>
+              <span className="text-dark-400">{currencySymbol}</span>
             </div>
             <p className="text-xs text-dark-500">{t('admin.tariffs.devicePriceHint')}</p>
             <div className="flex items-center gap-3">
@@ -994,7 +996,7 @@ export default function AdminTariffCreate() {
                               step={1}
                               placeholder="0"
                             />
-                            <span className="text-xs text-dark-400">₽</span>
+                            <span className="text-xs text-dark-400">{currencySymbol}</span>
                             <div className="flex-1" />
                             <button
                               type="button"

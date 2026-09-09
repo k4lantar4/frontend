@@ -17,9 +17,11 @@ import Twemoji from 'react-twemoji';
 // Country flags (simple emoji mapping)
 import { getFlagEmoji as getCountryFlag } from '../utils/subscriptionHelpers';
 import { Skeleton, SkeletonGroup } from '../components/ui/skeleton';
+import { useCurrency } from '../hooks/useCurrency';
 
 export default function AdminServers() {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { capabilities } = usePlatform();
@@ -139,7 +141,9 @@ export default function AdminServers() {
                       {server.current_users}
                       {server.max_users ? ` / ${server.max_users}` : ''}
                     </span>
-                    <span>{server.price_rubles} ₽</span>
+                    <span>
+                      {server.price_rubles} {currencySymbol}
+                    </span>
                     <span className="max-w-[200px] truncate font-mono text-xs text-dark-500">
                       {server.squad_uuid}
                     </span>

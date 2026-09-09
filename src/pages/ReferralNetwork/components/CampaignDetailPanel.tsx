@@ -4,6 +4,7 @@ import { CloseIcon } from '@/components/icons';
 import { referralNetworkApi } from '@/api/referralNetwork';
 import { useReferralNetworkStore } from '@/store/referralNetwork';
 import { formatKopeksToRubles } from '../utils';
+import { useCurrency } from '@/hooks/useCurrency';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
 
 interface CampaignDetailPanelProps {
@@ -13,6 +14,7 @@ interface CampaignDetailPanelProps {
 
 export function CampaignDetailPanel({ campaignId, className }: CampaignDetailPanelProps) {
   const { t } = useTranslation();
+  const { currencySymbol } = useCurrency();
   const setSelectedNode = useReferralNetworkStore((s) => s.setSelectedNode);
 
   const {
@@ -104,7 +106,7 @@ export function CampaignDetailPanel({ campaignId, className }: CampaignDetailPan
                     {t('admin.referralNetwork.campaign.totalRevenue')}
                   </span>
                   <span className="font-mono text-accent-400">
-                    {formatKopeksToRubles(campaign.total_revenue_kopeks)} ₽
+                    {formatKopeksToRubles(campaign.total_revenue_kopeks)} {currencySymbol}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -120,7 +122,7 @@ export function CampaignDetailPanel({ campaignId, className }: CampaignDetailPan
                     {t('admin.referralNetwork.campaign.avgCheck')}
                   </span>
                   <span className="font-mono text-dark-100">
-                    {formatKopeksToRubles(campaign.avg_check_kopeks)} ₽
+                    {formatKopeksToRubles(campaign.avg_check_kopeks)} {currencySymbol}
                   </span>
                 </div>
               </div>
