@@ -5,7 +5,7 @@ import { findSettingsSection } from './constants';
 
 describe('findSettingsSection', () => {
   it('принимает подпункт дерева и особый пункт, отбрасывает неизвестное', () => {
-    expect(findSettingsSection('sys_reachability')).toBe('sys_reachability');
+    expect(findSettingsSection('sys_core')).toBe('sys_core');
     expect(findSettingsSection('branding')).toBe('branding');
     expect(findSettingsSection('teapot')).toBeNull();
     expect(findSettingsSection(null)).toBeNull();
