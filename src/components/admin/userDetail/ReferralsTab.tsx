@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { backTo } from '../AdminBackButton';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { useNotify } from '../../../platform/hooks/useNotify';
 import { adminUsersApi, type UserDetailResponse, type UserListItem } from '../../../api/adminUsers';
+import { getApiErrorMessage } from '../../../utils/api-error';
 import { StatCard } from '@/components/stats';
 import { BanknotesIcon, PercentIcon, TagIcon, UsersIcon, XIcon } from '@/components/icons';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
@@ -25,6 +27,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
   const { t } = useTranslation();
   const { formatWithCurrency } = useCurrency();
   const navigate = useNavigate();
+  const location = useLocation();
   const notify = useNotify();
 
   // Referrals list — owned here, not in the parent.
@@ -160,8 +163,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
       setReferrerSearchResults([]);
       notify.success(t('admin.users.detail.referrals.referrerAssigned'));
     } catch (error: unknown) {
-      const axiosErr = error as { response?: { data?: { detail?: string } } };
-      notify.error(axiosErr?.response?.data?.detail || t('common.error'));
+      notify.error(getApiErrorMessage(error, t('common.error')));
     } finally {
       setActionLoading(false);
     }
@@ -174,8 +176,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
       await onUserRefresh();
       notify.success(t('admin.users.detail.referrals.referrerRemoved'));
     } catch (error: unknown) {
-      const axiosErr = error as { response?: { data?: { detail?: string } } };
-      notify.error(axiosErr?.response?.data?.detail || t('common.error'));
+      notify.error(getApiErrorMessage(error, t('common.error')));
     } finally {
       setActionLoading(false);
     }
@@ -189,8 +190,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
       await onUserRefresh();
       notify.success(t('admin.users.detail.referrals.referralRemoved'));
     } catch (error: unknown) {
-      const axiosErr = error as { response?: { data?: { detail?: string } } };
-      notify.error(axiosErr?.response?.data?.detail || t('common.error'));
+      notify.error(getApiErrorMessage(error, t('common.error')));
     } finally {
       setActionLoading(false);
     }
@@ -207,8 +207,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
       setAddReferralSearchResults([]);
       notify.success(t('admin.users.detail.referrals.referralAdded'));
     } catch (error: unknown) {
-      const axiosErr = error as { response?: { data?: { detail?: string } } };
-      notify.error(axiosErr?.response?.data?.detail || t('common.error'));
+      notify.error(getApiErrorMessage(error, t('common.error')));
     } finally {
       setActionLoading(false);
     }
@@ -227,7 +226,9 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
         {user.referral.referred_by_id ? (
           <div className="flex items-center justify-between gap-3">
             <button
-              onClick={() => navigate(`/admin/users/${user.referral.referred_by_id}`)}
+              onClick={() =>
+                navigate(`/admin/users/${user.referral.referred_by_id}`, backTo(location))
+              }
               className="flex items-center gap-3 rounded-xl bg-dark-700/30 px-4 py-3 transition-colors hover:bg-dark-700/50"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-500/20 text-sm font-bold text-accent-400">
@@ -458,7 +459,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
                 className="flex items-center justify-between rounded-xl bg-dark-700/20 px-4 py-3"
               >
                 <button
-                  onClick={() => navigate(`/admin/users/${ref.id}`)}
+                  onClick={() => navigate(`/admin/users/${ref.id}`, backTo(location))}
                   className="flex min-w-0 items-center gap-3 text-left"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-dark-600/50 text-sm font-bold text-dark-300">

@@ -1,6 +1,7 @@
 import i18n, { type ResourceLanguage } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { getTelegramLanguageCode } from './hooks/useTelegramSDK';
 
 const localeLoaders: Record<string, () => Promise<{ default: ResourceLanguage }>> = {
   ru: () => import('./locales/ru.json'),
@@ -62,7 +63,27 @@ const langsToLoad = [
   FALLBACK_LNG,
   ...(detectedLng !== DEFAULT_LNG && detectedLng !== FALLBACK_LNG ? [detectedLng] : []),
 ];
-Promise.all(langsToLoad.map(loadLanguage));
+
+// Сколько ждать словари, прежде чем рисовать без них. Белый экран хуже
+// непереведённого текста: если чанк локали не приехал (сеть отвалилась, прокси
+// отдал 502), приложение обязано появиться.
+const READY_TIMEOUT_MS = 5000;
+
+/**
+ * Резолвится, когда словари активного языка зарегистрированы в i18next.
+ *
+ * Локали лежат в отдельных ленивых чанках (~75 КБ gzip), а `useSuspense`
+ * выключен — значит react-i18next не приостановит отрисовку и `t('auth.login')`
+ * вернёт сам ключ. С прогретым кэшем чанк приходил раньше первой отрисовки и
+ * этого не было видно; на холодном интерфейс успевал нарисоваться с сырыми
+ * ключами. Точка входа ждёт этот промис перед `createRoot().render()`.
+ *
+ * Никогда не реджектится и не висит дольше READY_TIMEOUT_MS.
+ */
+export const i18nReady: Promise<void> = Promise.race([
+  Promise.all(langsToLoad.map(loadLanguage)).then(() => undefined),
+  new Promise<void>((resolve) => setTimeout(resolve, READY_TIMEOUT_MS)),
+]).catch(() => undefined);
 
 // Keep <html lang> + dir in sync with i18n so screen readers pronounce
 // content correctly, browsers don't offer to translate it, and RTL
@@ -90,25 +111,25 @@ i18n.on('languageChanged', (lng: string) => {
 });
 
 /**
- * Explicit LanguageSwitcher choice wins. Otherwise stay on DEFAULT_LNG (fa).
- * Telegram client language is not auto-applied (Layer A).
+ * On first run inside Telegram (no explicit stored choice), adopt the user's
+ * Telegram client language. Must be called after the Telegram SDK is initialised
+ * (e.g. from main.tsx), since launch params are unavailable before init().
  */
-export function applyCabinetLanguagePreference(preferred?: string | null): void {
+export function applyTelegramLanguage(): Promise<void> {
   try {
-    if (localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
+    if (localStorage.getItem(LANGUAGE_STORAGE_KEY)) return Promise.resolve(); // explicit choice wins
   } catch {
-    return;
+    return Promise.resolve();
   }
-  const raw = preferred?.split('-')[0]?.toLowerCase();
-  const code = raw && SUPPORTED_LANGS.includes(raw) ? raw : DEFAULT_LNG;
-  if (i18n.language?.split('-')[0] !== code) {
+  const code = getTelegramLanguageCode();
+  if (code && SUPPORTED_LANGS.includes(code) && i18n.language?.split('-')[0] !== code) {
     i18n.changeLanguage(code);
+    // Возвращаем именно загрузку словаря, а не changeLanguage: обработчик
+    // languageChanged тянет чанк отдельно, и без этого ожидания точка входа
+    // нарисовала бы новый язык до его словаря — те же сырые ключи.
+    return loadLanguage(code).catch(() => undefined);
   }
-}
-
-/** @deprecated Use applyCabinetLanguagePreference — Telegram client lang is not auto-applied. */
-export function applyTelegramLanguage(): void {
-  applyCabinetLanguagePreference();
+  return Promise.resolve();
 }
 
 export default i18n;
