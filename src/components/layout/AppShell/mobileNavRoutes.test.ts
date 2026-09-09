@@ -55,7 +55,7 @@ describe('isMobileNavScreen', () => {
   });
 
   it('админка и вложенные страницы — нет', () => {
-    for (const path of ['/admin', '/admin/reachability', '/balance/top-up']) {
+    for (const path of ['/admin', '/admin/remnawave', '/balance/top-up']) {
       expect(isMobileNavScreen(path, items), path).toBe(false);
     }
   });
