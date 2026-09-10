@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { statsApi, type NodeStatus } from '../api/admin';
 import { formatUptime } from '../utils/format';
+import { paymentsTotalToman } from '../utils/adminBalance';
 
 const CABINET_VERSION = __APP_VERSION__;
 import { useCurrency } from '../hooks/useCurrency';
@@ -813,13 +814,13 @@ export default function AdminDashboard() {
                 </h2>
                 <p className="text-xs text-dark-400 sm:text-sm">
                   {t('adminDashboard.recentPayments.today', {
-                    amount: `${formatAmount(payments.total_today_kopeks / 100)} ${currencySymbol}`,
+                    amount: `${formatAmount(paymentsTotalToman(payments.total_today_toman, payments.total_today_kopeks))} ${currencySymbol}`,
                   })}
                   <span className="hidden sm:inline">
                     {' '}
                     ·{' '}
                     {t('adminDashboard.recentPayments.week', {
-                      amount: `${formatAmount(payments.total_week_kopeks / 100)} ${currencySymbol}`,
+                      amount: `${formatAmount(paymentsTotalToman(payments.total_week_toman, payments.total_week_kopeks))} ${currencySymbol}`,
                     })}
                   </span>
                 </p>
