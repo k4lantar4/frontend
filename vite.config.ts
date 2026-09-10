@@ -31,6 +31,12 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: true,
+      // Vite's dev server only trusts the "localhost" Host header by default and
+      // 403s anything else, to stop external sites DNS-rebinding into it. We proxy
+      // it through Caddy at panel.rookari.com (docker-compose.dev.yml), so that
+      // host needs to be allow-listed explicitly. Doesn't affect `vite build` —
+      // this only applies to `vite`/`vite dev`.
+      allowedHosts: ['panel.rookari.com'],
       proxy: {
         '/api': {
           target: 'http://localhost:8080',
