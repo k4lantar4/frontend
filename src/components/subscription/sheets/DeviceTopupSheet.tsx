@@ -7,6 +7,7 @@ import InsufficientBalancePrompt from '../../InsufficientBalancePrompt';
 import { ChevronRightIcon } from '../../icons';
 import type { PurchaseOptions, Subscription } from '../../../types';
 import { useCurrency } from '../../../hooks/useCurrency';
+import { missingToman, userCanAfford } from '../../../utils/catalogScale';
 
 // ──────────────────────────────────────────────────────────────────
 // Buy-devices sheet. Self-owns its devicePrice query + purchase mutation;
@@ -210,11 +211,13 @@ export function DeviceTopupSheet({
           {devicePriceData?.available &&
             purchaseOptions &&
             devicePriceData.total_price_kopeks &&
-            devicePriceData.total_price_kopeks > purchaseOptions.balance_kopeks && (
+            !userCanAfford(purchaseOptions.balance_kopeks, devicePriceData.total_price_kopeks) && (
               <InsufficientBalancePrompt
-                missingAmountKopeks={
-                  devicePriceData.total_price_kopeks - purchaseOptions.balance_kopeks
-                }
+                missingAmountKopeks={missingToman(
+                  purchaseOptions.balance_kopeks,
+                  devicePriceData.total_price_kopeks,
+                )}
+                amountScale="toman"
                 compact
                 onBeforeTopUp={async () => {
                   await subscriptionApi.saveDevicesCart(devicesToAdd, subscriptionId);
@@ -230,7 +233,7 @@ export function DeviceTopupSheet({
               !!(
                 devicePriceData?.total_price_kopeks &&
                 purchaseOptions &&
-                devicePriceData.total_price_kopeks > purchaseOptions.balance_kopeks
+                !userCanAfford(purchaseOptions.balance_kopeks, devicePriceData.total_price_kopeks)
               )
             }
             className="btn-primary w-full py-3"
