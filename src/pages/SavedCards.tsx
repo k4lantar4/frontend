@@ -101,7 +101,7 @@ export default function SavedCards() {
   // between the two pages.
   const { data: subscriptionsData } = useQuery({
     queryKey: ['subscriptions-list'],
-    queryFn: subscriptionApi.getSubscriptions,
+    queryFn: () => subscriptionApi.getSubscriptions(),
   });
   const nonTrialSubs = (subscriptionsData?.subscriptions ?? []).filter((sub) => !sub.is_trial);
 
