@@ -81,28 +81,48 @@ export const isLogoPreloaded = (): boolean => {
   }
 };
 
-// Get cached branding from sessionStorage
+/**
+ * Real branding, as the bot's BrandingResponse always sends it. The cache is the
+ * starting data of every page, so anything else in it (an HTML page that came
+ * back with status 200, an old-format object) crashed the whole cabinet on
+ * `branding.name.trim()` until the tab was closed.
+ */
+export const isBrandingInfo = (value: unknown): value is BrandingInfo =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as { name?: unknown }).name === 'string';
+
+// Get cached branding from sessionStorage; a value that is not branding is dropped.
 export const getCachedBranding = (): BrandingInfo | null => {
   try {
     const cached = sessionStorage.getItem(BRANDING_CACHE_KEY);
     if (cached) {
-      return JSON.parse(cached);
+      const parsed: unknown = JSON.parse(cached);
+      if (isBrandingInfo(parsed)) return parsed;
+      sessionStorage.removeItem(BRANDING_CACHE_KEY);
+      return null;
     }
     // One-time migration: move stale localStorage value to sessionStorage
     const legacy = localStorage.getItem(BRANDING_CACHE_KEY);
     if (legacy) {
       localStorage.removeItem(BRANDING_CACHE_KEY);
+      const parsed: unknown = JSON.parse(legacy);
+      if (!isBrandingInfo(parsed)) return null;
       sessionStorage.setItem(BRANDING_CACHE_KEY, legacy);
-      return JSON.parse(legacy);
+      return parsed;
     }
   } catch {
     // storage not available or invalid JSON
+    try {
+      sessionStorage.removeItem(BRANDING_CACHE_KEY);
+    } catch {}
   }
   return null;
 };
 
-// Update branding cache in sessionStorage
+// Update branding cache in sessionStorage; never stores something that is not branding.
 export const setCachedBranding = (branding: BrandingInfo) => {
+  if (!isBrandingInfo(branding)) return;
   try {
     sessionStorage.setItem(BRANDING_CACHE_KEY, JSON.stringify(branding));
   } catch {}
@@ -184,6 +204,11 @@ export const brandingApi = {
   // Get current branding (public, no auth required)
   getBranding: async (): Promise<BrandingInfo> => {
     const response = await apiClient.get<BrandingInfo>('/cabinet/branding');
+    // A 200 that isn't branding (e.g. an HTML page) must fail the query, not be
+    // cached and rendered: the callers keep their fallback name instead.
+    if (!isBrandingInfo(response.data)) {
+      throw new Error('Malformed branding response');
+    }
     return response.data;
   },
 
