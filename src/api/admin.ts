@@ -319,8 +319,11 @@ export interface RecentPaymentItem {
 export interface RecentPaymentsResponse {
   payments: RecentPaymentItem[];
   total_count: number;
+  /** Raw storage sums across mixed scales — display the *_toman fields instead. */
   total_today_kopeks: number;
   total_week_kopeks: number;
+  total_today_toman?: number;
+  total_week_toman?: number;
 }
 
 export interface SystemInfo {

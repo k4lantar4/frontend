@@ -1,4 +1,25 @@
 import axios from 'axios';
+import i18next from 'i18next';
+
+/**
+ * Machine codes the bot sends in a structured detail ({code, message}) that the
+ * user should read in our own words, not as the backend's English sentence.
+ */
+const CODE_MESSAGE_KEYS: Record<string, string> = {
+  // 403 from every email/password route when an admin turned email sign-in off.
+  email_auth_disabled: 'auth.emailAuthDisabled',
+};
+
+/** The `code` of a structured backend error, if there is one. */
+export function getApiErrorCode(err: unknown): string | undefined {
+  if (!axios.isAxiosError(err)) return undefined;
+  const detail = err.response?.data?.detail;
+  if (detail && typeof detail === 'object' && !Array.isArray(detail)) {
+    const code = (detail as { code?: unknown }).code;
+    if (typeof code === 'string') return code;
+  }
+  return undefined;
+}
 
 /**
  * True when the backend answered 404 on the route itself — for cabinet
@@ -35,6 +56,11 @@ export function getApiErrorMessage(err: unknown, fallback: string): string {
     // maintenance и т.п.) — берём message. Объект в тексте ошибки роняет React (#31).
     if (detail && typeof detail === 'object') {
       const message = (detail as { message?: unknown }).message;
+      const code = getApiErrorCode(err);
+      const key = code ? CODE_MESSAGE_KEYS[code] : undefined;
+      if (key) {
+        return i18next.t(key, { defaultValue: typeof message === 'string' ? message : fallback });
+      }
       if (typeof message === 'string') return message;
     }
     return fallback;

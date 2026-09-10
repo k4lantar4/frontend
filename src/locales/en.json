@@ -226,6 +226,7 @@
     "invalidEmail": "Please enter a valid email address",
     "emailAlreadyRegistered": "This email is already registered",
     "invalidCredentials": "Invalid email or password",
+    "emailAuthDisabled": "Email sign-in is turned off right now. Please use another sign-in method.",
     "tooManyAttempts": "Too many attempts. Please try again later",
     "verificationEmailNotice": "After registration, a verification email will be sent to your address",
     "legalConsentPrefix": "I have read the",

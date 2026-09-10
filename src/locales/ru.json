@@ -229,6 +229,7 @@
     "invalidEmail": "Введите корректный email адрес",
     "emailAlreadyRegistered": "Этот email уже зарегистрирован",
     "invalidCredentials": "Неверный email или пароль",
+    "emailAuthDisabled": "Вход по email сейчас отключён. Воспользуйтесь другим способом входа.",
     "forgotPasswordHint": "Введите email и мы отправим инструкции для сброса пароля.",
     "passwordResetSent": "Если аккаунт с таким email существует, мы отправили инструкции по сбросу пароля.",
     "sendResetLink": "Отправить ссылку",
