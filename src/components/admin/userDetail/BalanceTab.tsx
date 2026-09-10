@@ -6,6 +6,7 @@ import { adminUsersApi, type UserDetailResponse } from '../../../api/adminUsers'
 import { promocodesApi } from '../../../api/promocodes';
 import { promoOffersApi } from '../../../api/promoOffers';
 import { createNumberInputHandler, toNumber } from '../../../utils/inputHelpers';
+import { adminBalanceUpdatePayload } from '../../../utils/adminBalance';
 import { PlusIcon, MinusIcon } from '@/components/icons';
 
 // ──────────────────────────────────────────────────────────────────
@@ -62,15 +63,18 @@ export function BalanceTab({
     if (balanceAmount === '') return;
     setActionLoading(true);
     try {
-      const amount = Math.abs(toNumber(balanceAmount) * 100);
-      await adminUsersApi.updateBalance(userId, {
-        amount_kopeks: isAdd ? amount : -amount,
-        description:
+      // «مبلغ به تومان» is credited 1:1 — the balance is stored in Toman.
+      await adminUsersApi.updateBalance(
+        userId,
+        adminBalanceUpdatePayload(
+          toNumber(balanceAmount),
+          isAdd,
           balanceDescription ||
-          (isAdd
-            ? t('admin.users.detail.balance.addByAdmin')
-            : t('admin.users.detail.balance.subtractByAdmin')),
-      });
+            (isAdd
+              ? t('admin.users.detail.balance.addByAdmin')
+              : t('admin.users.detail.balance.subtractByAdmin')),
+        ),
+      );
       await onUserRefresh();
       setBalanceAmount('');
       setBalanceDescription('');

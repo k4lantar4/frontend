@@ -181,6 +181,8 @@ export interface UserActivityItem {
   source: string | null;
   title: string | null;
   amount_kopeks: number | null;
+  /** Display Toman (signed) when the backend knows the source's scale; absent on older backends. */
+  amount_toman?: number | null;
   timestamp: string;
   meta: Record<string, unknown> | null;
 }
@@ -326,7 +328,10 @@ export interface PanelSyncStatusResponse {
 
 // Update types
 export interface UpdateBalanceRequest {
-  amount_kopeks: number;
+  /** Toman as typed by the admin (balance is stored Toman 1:1); negative deducts. */
+  amount_display?: number;
+  /** Legacy raw balance storage amount — prefer amount_display. */
+  amount_kopeks?: number;
   description?: string;
   create_transaction?: boolean;
 }

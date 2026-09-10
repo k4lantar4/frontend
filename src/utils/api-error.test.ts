@@ -1,6 +1,7 @@
 import { AxiosError, AxiosHeaders } from 'axios';
-import { describe, expect, it } from 'vitest';
-import { getApiErrorMessage, isEndpointMissingError } from './api-error';
+import i18next from 'i18next';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { getApiErrorCode, getApiErrorMessage, isEndpointMissingError } from './api-error';
 
 function axiosErrorWithStatus(status: number, detail?: unknown): AxiosError {
   const headers = new AxiosHeaders();
@@ -75,5 +76,45 @@ describe('getApiErrorMessage', () => {
   it('falls back for a structured detail without a string message', () => {
     expect(getApiErrorMessage(axiosErrorWithStatus(400, { code: 'x' }), 'fb')).toBe('fb');
     expect(getApiErrorMessage(axiosErrorWithStatus(400, { message: 7 }), 'fb')).toBe('fb');
+  });
+});
+
+// The bot answers 403 {code: 'email_auth_disabled', message: <English>} when an admin
+// has turned email login off; the user must see our own translated text, not the
+// backend's English sentence.
+describe('known backend error codes', () => {
+  const disabled = () =>
+    axiosErrorWithStatus(403, {
+      code: 'email_auth_disabled',
+      message: 'Email authentication is disabled',
+    });
+
+  beforeAll(async () => {
+    await i18next.init({
+      lng: 'fa',
+      resources: {
+        fa: { translation: { auth: { emailAuthDisabled: 'ورود با ایمیل غیرفعال است' } } },
+      },
+    });
+  });
+
+  it('reads the machine code from a structured detail', () => {
+    expect(getApiErrorCode(disabled())).toBe('email_auth_disabled');
+  });
+
+  it('has no code for plain, validation or non-axios errors', () => {
+    expect(getApiErrorCode(axiosErrorWithStatus(400, 'plain'))).toBeUndefined();
+    expect(getApiErrorCode(axiosErrorWithStatus(422, [{ msg: 'x' }]))).toBeUndefined();
+    expect(getApiErrorCode(axiosErrorWithStatus(400, { code: 7 }))).toBeUndefined();
+    expect(getApiErrorCode(new Error('boom'))).toBeUndefined();
+  });
+
+  it('translates email_auth_disabled instead of showing the English message', () => {
+    expect(getApiErrorMessage(disabled(), 'fb')).toBe('ورود با ایمیل غیرفعال است');
+  });
+
+  it('keeps the backend message for codes it does not know', () => {
+    const err = axiosErrorWithStatus(403, { code: 'something_else', message: 'Backend says no' });
+    expect(getApiErrorMessage(err, 'fb')).toBe('Backend says no');
   });
 });

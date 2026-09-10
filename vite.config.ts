@@ -9,6 +9,11 @@ export default defineConfig(({ mode }) => {
   // Переменные из .env и из окружения сборки (Docker передаёт их через ENV);
   // окружение сильнее файла — как и у самого Vite.
   const env = { ...loadEnv(mode, __dirname, 'VITE_'), ...process.env };
+  // Where the dev server's /api and /health proxies send requests. localhost:8080 is right when
+  // Vite and the bot share a host. In docker-compose.dev.yml Vite runs in its own container, where
+  // localhost is that container, so the compose file points this at the bot container instead.
+  // Deliberately not VITE_-prefixed: it is dev-server config and must not reach the client bundle.
+  const devProxyTarget = env.DEV_API_PROXY_TARGET || 'http://localhost:8080';
   return {
     plugins: [
       react(),
@@ -39,7 +44,7 @@ export default defineConfig(({ mode }) => {
       allowedHosts: ['panel.rookari.com'],
       proxy: {
         '/api': {
-          target: 'http://localhost:8080',
+          target: devProxyTarget,
           changeOrigin: true,
           // Strip /api prefix: /api/cabinet/auth -> /cabinet/auth
           rewrite: (path) => path.replace(/^\/api/, ''),
@@ -48,7 +53,7 @@ export default defineConfig(({ mode }) => {
         // /api). Proxy it too so the "service unavailable" detection probe hits the
         // real backend in dev instead of the Vite server (which would mask outages).
         '/health': {
-          target: 'http://localhost:8080',
+          target: devProxyTarget,
           changeOrigin: true,
         },
       },
