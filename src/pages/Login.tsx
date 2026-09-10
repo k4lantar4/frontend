@@ -16,7 +16,7 @@ import {
   type EmailAuthEnabled,
 } from '../api/branding';
 import { getAndClearReturnUrl, tokenStorage } from '../utils/token';
-import { getApiErrorMessage } from '../utils/api-error';
+import { getApiErrorCode, getApiErrorMessage } from '../utils/api-error';
 import { isInTelegramWebApp, getTelegramInitData, useTelegramSDK } from '../hooks/useTelegramSDK';
 import { closeMiniApp } from '@telegram-apps/sdk-react';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -320,7 +320,11 @@ export default function Login() {
         return;
       }
 
-      if (status === 400 && detail.includes('already registered')) {
+      if (getApiErrorCode(err) === 'email_auth_disabled') {
+        // An admin turned email sign-in off after this page loaded: say so,
+        // instead of the 403 branch below reading it as a wrong password.
+        setError(detail);
+      } else if (status === 400 && detail.includes('already registered')) {
         setError(t('auth.emailAlreadyRegistered', 'This email is already registered'));
       } else if (status === 401 || status === 403) {
         if (detail.includes('verify your email')) {
