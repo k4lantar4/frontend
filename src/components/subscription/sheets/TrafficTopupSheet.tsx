@@ -6,6 +6,7 @@ import InsufficientBalancePrompt from '../../InsufficientBalancePrompt';
 import { ChevronRightIcon } from '../../icons';
 import type { PurchaseOptions, Subscription } from '../../../types';
 import { useCurrency } from '../../../hooks/useCurrency';
+import { missingToman, userCanAfford } from '../../../utils/catalogScale';
 
 // ──────────────────────────────────────────────────────────────────
 // Buy-traffic sheet. Self-owns the packages query + purchase mutation;
@@ -171,10 +172,11 @@ export function TrafficTopupSheet({
               const hasEnoughBalance =
                 !selectedPkg ||
                 !purchaseOptions ||
-                selectedPkg.price_kopeks <= purchaseOptions.balance_kopeks;
+                userCanAfford(purchaseOptions.balance_kopeks, selectedPkg.price_kopeks);
+              // Toman shortfall: package price is catalog (x100), balance is Toman 1:1
               const missingAmount =
                 selectedPkg && purchaseOptions
-                  ? selectedPkg.price_kopeks - purchaseOptions.balance_kopeks
+                  ? missingToman(purchaseOptions.balance_kopeks, selectedPkg.price_kopeks)
                   : 0;
 
               return (
@@ -182,6 +184,7 @@ export function TrafficTopupSheet({
                   {!hasEnoughBalance && missingAmount > 0 && (
                     <InsufficientBalancePrompt
                       missingAmountKopeks={missingAmount}
+                      amountScale="toman"
                       compact
                       className="mb-3"
                       onBeforeTopUp={async () => {
