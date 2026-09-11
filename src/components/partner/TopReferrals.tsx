@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import type { CampaignReferralItem } from '../../api/partners';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 
 interface TopReferralsProps {
   referrals: CampaignReferralItem[];
@@ -26,7 +27,6 @@ function StatusBadge({ hasPaid, isActive }: StatusBadgeProps) {
 
 export function TopReferrals({ referrals }: TopReferralsProps) {
   const { t, i18n } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   if (referrals.length === 0) {
     return (
@@ -60,7 +60,9 @@ export function TopReferrals({ referrals }: TopReferralsProps) {
             </div>
             <div className="text-sm font-semibold text-success-400">
               {/* Referral earnings (ReferralEarning sums) are Toman 1:1 — no ÷100. */}
-              {formatWithCurrency(ref.total_earnings_kopeks, 0)}
+              {formatBalance(
+                tomanOrLegacy(ref.total_earnings_toman, ref.total_earnings_kopeks, 'balance'),
+              )}
             </div>
           </div>
         ))}

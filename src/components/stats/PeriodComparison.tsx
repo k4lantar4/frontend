@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import type { PeriodComparison as PeriodComparisonType } from './types';
 import { TREND_STYLES } from './constants';
-import { PARTNER_STATS } from '../../constants/partner';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 
 interface PeriodComparisonProps {
   data: PeriodComparisonType;
@@ -35,7 +35,6 @@ export function PeriodComparison({
   comparisonLabel,
 }: PeriodComparisonProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const resolvedTitle = title ?? t('referral.partner.stats.periodComparison');
   const resolvedCountLabel = countLabel ?? t('referral.partner.stats.referralsCount');
@@ -66,7 +65,9 @@ export function PeriodComparison({
           <div className="text-xs text-dark-500">{resolvedEarningsLabel}</div>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-base font-semibold text-success-400 sm:text-lg">
-              {formatWithCurrency(data.current.earnings_kopeks / PARTNER_STATS.KOPEKS_DIVISOR)}
+              {formatBalance(
+                tomanOrLegacy(data.current.earnings_toman, data.current.earnings_kopeks, 'catalog'),
+              )}
             </span>
             <TrendBadge trend={data.earnings_change.trend} percent={data.earnings_change.percent} />
           </div>

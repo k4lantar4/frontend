@@ -16,6 +16,8 @@ export interface CampaignListItem {
   is_active: boolean;
   registrations_count: number;
   total_revenue_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_revenue_toman?: number;
   conversion_rate: number;
   partner_user_id: number | null;
   partner_name: string | null;
@@ -104,6 +106,14 @@ export interface CampaignStatistics {
   avg_revenue_per_user_rubles: number;
   avg_first_payment_kopeks: number;
   avg_first_payment_rubles: number;
+  /**
+   * Display Toman (remnabot#40). Prefer these: `total_revenue_rubles` and
+   * `avg_revenue_per_user_rubles` divide a Toman deposit sum by 100.
+   */
+  total_revenue_toman?: number;
+  avg_revenue_per_user_toman?: number;
+  avg_first_payment_toman?: number;
+  balance_issued_toman?: number;
   trial_users_count: number;
   active_trials_count: number;
   conversion_count: number;
@@ -145,6 +155,7 @@ export interface CampaignsOverview {
   total_registrations: number;
   total_balance_issued_kopeks: number;
   total_balance_issued_rubles: number;
+  total_balance_issued_toman?: number;
   total_subscription_issued: number;
   total_tariff_issued: number;
 }
@@ -153,12 +164,14 @@ export interface AdminDailyStatItem {
   date: string;
   referrals_count: number;
   earnings_kopeks: number;
+  earnings_toman?: number;
 }
 
 export interface AdminPeriodStats {
   days: number;
   referrals_count: number;
   earnings_kopeks: number;
+  earnings_toman?: number;
 }
 
 export interface AdminPeriodChange {
@@ -181,12 +194,16 @@ export interface AdminTopRegistrationItem {
   has_paid: boolean;
   is_active: boolean;
   total_earnings_kopeks: number;
+  total_earnings_toman?: number;
 }
 
 export interface AdminCampaignChartData {
   campaign_id: number;
   total_deposits_kopeks: number;
   total_spending_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_deposits_toman?: number;
+  total_spending_toman?: number;
   daily_stats: AdminDailyStatItem[];
   period_comparison: AdminPeriodComparison;
   top_registrations: AdminTopRegistrationItem[];

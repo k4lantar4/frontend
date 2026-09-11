@@ -32,6 +32,8 @@ export interface PartnerCampaignInfo {
   registrations_count: number;
   referrals_count: number;
   earnings_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  earnings_toman?: number;
 }
 
 export interface PartnerStatusResponse {
@@ -56,12 +58,14 @@ export interface DailyStatItem {
   date: string;
   referrals_count: number;
   earnings_kopeks: number;
+  earnings_toman?: number;
 }
 
 export interface PeriodStats {
   days: number;
   referrals_count: number;
   earnings_kopeks: number;
+  earnings_toman?: number;
 }
 
 export interface PeriodChange {
@@ -84,6 +88,7 @@ export interface CampaignReferralItem {
   has_paid: boolean;
   is_active: boolean;
   total_earnings_kopeks: number;
+  total_earnings_toman?: number;
 }
 
 export interface PartnerCampaignDetailedStats {
@@ -96,6 +101,11 @@ export interface PartnerCampaignDetailedStats {
   earnings_today: number;
   earnings_week: number;
   earnings_month: number;
+  /** Display Toman (remnabot#40). */
+  earnings_toman?: number;
+  earnings_today_toman?: number;
+  earnings_week_toman?: number;
+  earnings_month_toman?: number;
   daily_stats: DailyStatItem[];
   period_comparison: PeriodComparison;
   top_referrals: CampaignReferralItem[];

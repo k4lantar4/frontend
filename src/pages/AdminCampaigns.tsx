@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
 import { campaignsApi, type CampaignListItem, type CampaignBonusType } from '../api/campaigns';
 import {
   PlusIcon,
@@ -20,7 +19,8 @@ import {
 import { StatCard } from '../components/stats';
 import { usePlatform } from '../platform/hooks/usePlatform';
 import { useFocusTrap } from '../hooks/useFocusTrap';
-import { useCurrency } from '../hooks/useCurrency';
+import { tomanOrLegacy } from '../utils/balanceScale';
+import { formatBalance } from '../utils/format';
 import { Skeleton, SkeletonGroup } from '../components/ui/skeleton';
 
 const PAGE_SIZE = 50;
@@ -52,26 +52,9 @@ const bonusTypeConfig: Record<
   },
 };
 
-// Locale mapping for formatting
-const localeMap: Record<string, string> = { ru: 'ru-RU', en: 'en-US', zh: 'zh-CN', fa: 'fa-IR' };
-
-// Format a money amount in the active currency
-const formatMoney = (kopeks: number, currencySymbol: string, divisor: 100 | 1 = 100) => {
-  const locale = localeMap[i18n.language] || 'ru-RU';
-  return (
-    (kopeks / divisor).toLocaleString(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }) +
-    ' ' +
-    currencySymbol
-  );
-};
-
 // Main Component
 export default function AdminCampaigns() {
   const { t } = useTranslation();
-  const { currencySymbol } = useCurrency();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { capabilities } = usePlatform();
@@ -173,10 +156,14 @@ export default function AdminCampaigns() {
           />
           <StatCard
             label={t('admin.campaigns.overview.bonusesIssued')}
-            // total_balance_issued_kopeks is a raw Toman amount post-Phase-B, not
-            // kopeks — divisor=1 (unlike total_revenue_kopeks below, which is real
-            // catalog/revenue kopek-scale).
-            value={formatMoney(overview.total_balance_issued_kopeks, currencySymbol, 1)}
+            // Bonuses are Toman 1:1; the legacy *_kopeks field is not ×100.
+            value={formatBalance(
+              tomanOrLegacy(
+                overview.total_balance_issued_toman,
+                overview.total_balance_issued_kopeks,
+                'balance',
+              ),
+            )}
             icon={<BanknotesIcon className="h-5 w-5" />}
             tone="success"
           />
@@ -230,7 +217,13 @@ export default function AdminCampaigns() {
                     </span>
                     <span>
                       {t('admin.campaigns.table.revenue', {
-                        amount: formatMoney(campaign.total_revenue_kopeks, currencySymbol),
+                        amount: formatBalance(
+                          tomanOrLegacy(
+                            campaign.total_revenue_toman,
+                            campaign.total_revenue_kopeks,
+                            'catalog',
+                          ),
+                        ),
                       })}
                     </span>
                     <span>

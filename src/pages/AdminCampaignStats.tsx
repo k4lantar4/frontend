@@ -7,7 +7,8 @@ import type { AdminCampaignChartData } from '../api/campaigns';
 import { AdminBackButton, backTo } from '../components/admin';
 import { DailyChart, PeriodComparison, StatCard } from '../components/stats';
 import { PARTNER_STATS } from '../constants/partner';
-import { useCurrency } from '../hooks/useCurrency';
+import { tomanOrLegacy } from '../utils/balanceScale';
+import { formatBalance } from '../utils/format';
 import { copyToClipboard } from '../utils/clipboard';
 import { useHaptic } from '../platform';
 import { ChartIcon, ChevronDownIcon, CopyIcon, LinkIcon, UsersIcon } from '@/components/icons';
@@ -48,7 +49,6 @@ export default function AdminCampaignStats() {
   const navigate = useNavigate();
   const location = useLocation();
   const haptic = useHaptic();
-  const { formatWithCurrency } = useCurrency();
   const [copiedBot, setCopiedBot] = useState(false);
   const [copiedWeb, setCopiedWeb] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
@@ -257,7 +257,9 @@ export default function AdminCampaignStats() {
           </div>
           <div className="rounded-xl border border-dark-700 bg-dark-800 p-4 text-center">
             <div className="truncate text-xl font-bold text-success-400 sm:text-2xl">
-              {formatWithCurrency(stats.total_revenue_kopeks / PARTNER_STATS.KOPEKS_DIVISOR)}
+              {formatBalance(
+                tomanOrLegacy(stats.total_revenue_toman, stats.total_revenue_kopeks, 'catalog'),
+              )}
             </div>
             <div className="text-xs text-dark-500">{t('admin.campaigns.stats.revenue')}</div>
           </div>
@@ -287,11 +289,14 @@ export default function AdminCampaignStats() {
               </div>
               {stats.bonus_type === 'balance' && (
                 <div className="text-lg font-medium text-success-400">
-                  {/* balance_issued_kopeks is a raw Toman amount post-Phase-B, not
-                      kopeks — use the already-unscaled _rubles field instead of
-                      dividing by KOPEKS_DIVISOR (that only applies to real
-                      catalog/revenue kopek-scale fields on this page). */}
-                  {formatWithCurrency(stats.balance_issued_rubles)}
+                  {/* Bonuses are Toman 1:1; the old _rubles field was already unscaled. */}
+                  {formatBalance(
+                    tomanOrLegacy(
+                      stats.balance_issued_toman,
+                      stats.balance_issued_rubles,
+                      'balance',
+                    ),
+                  )}
                 </div>
               )}
               {stats.bonus_type === 'subscription' && (
@@ -315,8 +320,12 @@ export default function AdminCampaignStats() {
                 {t('admin.campaigns.stats.avgRevenuePerUser')}
               </div>
               <div className="text-lg font-medium text-dark-200">
-                {formatWithCurrency(
-                  stats.avg_revenue_per_user_kopeks / PARTNER_STATS.KOPEKS_DIVISOR,
+                {formatBalance(
+                  tomanOrLegacy(
+                    stats.avg_revenue_per_user_toman,
+                    stats.avg_revenue_per_user_kopeks,
+                    'catalog',
+                  ),
                 )}
               </div>
             </div>
@@ -325,7 +334,13 @@ export default function AdminCampaignStats() {
                 {t('admin.campaigns.stats.avgFirstPayment')}
               </div>
               <div className="text-lg font-medium text-dark-200">
-                {formatWithCurrency(stats.avg_first_payment_kopeks / PARTNER_STATS.KOPEKS_DIVISOR)}
+                {formatBalance(
+                  tomanOrLegacy(
+                    stats.avg_first_payment_toman,
+                    stats.avg_first_payment_kopeks,
+                    'catalog',
+                  ),
+                )}
               </div>
             </div>
             <div className="rounded-lg bg-dark-700/50 p-3">
@@ -373,15 +388,23 @@ export default function AdminCampaignStats() {
               <div className="grid grid-cols-2 gap-3">
                 <StatCard
                   label={t('admin.campaigns.stats.totalDeposits')}
-                  value={formatWithCurrency(
-                    chartData.total_deposits_kopeks / PARTNER_STATS.KOPEKS_DIVISOR,
+                  value={formatBalance(
+                    tomanOrLegacy(
+                      chartData.total_deposits_toman,
+                      chartData.total_deposits_kopeks,
+                      'catalog',
+                    ),
                   )}
                   valueClassName="text-success-400"
                 />
                 <StatCard
                   label={t('admin.campaigns.stats.totalSpending')}
-                  value={formatWithCurrency(
-                    chartData.total_spending_kopeks / PARTNER_STATS.KOPEKS_DIVISOR,
+                  value={formatBalance(
+                    tomanOrLegacy(
+                      chartData.total_spending_toman,
+                      chartData.total_spending_kopeks,
+                      'catalog',
+                    ),
                   )}
                   valueClassName="text-accent-400"
                 />
@@ -433,8 +456,12 @@ export default function AdminCampaignStats() {
                           </div>
                         </div>
                         <div className="text-sm font-semibold text-success-400">
-                          {formatWithCurrency(
-                            reg.total_earnings_kopeks / PARTNER_STATS.KOPEKS_DIVISOR,
+                          {formatBalance(
+                            tomanOrLegacy(
+                              reg.total_earnings_toman,
+                              reg.total_earnings_kopeks,
+                              'catalog',
+                            ),
                           )}
                         </div>
                       </Link>

@@ -12,7 +12,8 @@ import {
 
 import type { DailyStatItem } from './types';
 import { PARTNER_STATS } from '../../constants/partner';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 import { useChartColors } from '../../hooks/useChartColors';
 
 interface DailyChartProps {
@@ -30,7 +31,6 @@ interface ChartDataItem extends DailyStatItem {
 
 export function DailyChart({ data, chartId, title, earningsLabel, countLabel }: DailyChartProps) {
   const { t, i18n } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
   const colors = useChartColors();
 
   const resolvedTitle = title ?? t('referral.partner.stats.dailyChart');
@@ -41,7 +41,7 @@ export function DailyChart({ data, chartId, title, earningsLabel, countLabel }: 
     () =>
       data.map((item) => ({
         ...item,
-        earnings_display: item.earnings_kopeks / PARTNER_STATS.KOPEKS_DIVISOR,
+        earnings_display: tomanOrLegacy(item.earnings_toman, item.earnings_kopeks, 'catalog'),
         label: new Date(item.date + 'T00:00:00').toLocaleDateString(i18n.language, {
           month: 'short',
           day: 'numeric',
@@ -118,7 +118,7 @@ export function DailyChart({ data, chartId, title, earningsLabel, countLabel }: 
             formatter={(value, name) => {
               const displayValue = Number(value) || 0;
               if (name === 'earnings_display') {
-                return [formatWithCurrency(displayValue), resolvedEarningsLabel];
+                return [formatBalance(displayValue), resolvedEarningsLabel];
               }
               return [displayValue, resolvedCountLabel];
             }}

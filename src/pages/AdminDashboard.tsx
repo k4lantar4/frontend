@@ -4,8 +4,9 @@ import { backTo } from '@/components/admin';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { statsApi, type NodeStatus } from '../api/admin';
-import { formatUptime } from '../utils/format';
+import { formatBalance, formatUptime } from '../utils/format';
 import { paymentsTotalToman } from '../utils/adminBalance';
+import { tomanOrLegacy } from '../utils/balanceScale';
 
 const CABINET_VERSION = __APP_VERSION__;
 import { useCurrency } from '../hooks/useCurrency';
@@ -776,7 +777,13 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex-shrink-0 text-right">
                     <div className="text-xs font-semibold text-warning-400 sm:text-sm">
-                      {formatAmount(campaign.total_revenue_kopeks / 100)} {currencySymbol}
+                      {formatBalance(
+                        tomanOrLegacy(
+                          campaign.total_revenue_toman,
+                          campaign.total_revenue_kopeks,
+                          'catalog',
+                        ),
+                      )}
                     </div>
                     <div className="text-[10px] text-dark-500 sm:text-xs">
                       {campaign.registrations} · {campaign.conversion_rate.toFixed(0)}%
@@ -792,7 +799,13 @@ export default function AdminDashboard() {
                   {t('adminDashboard.topCampaigns.total')}
                 </span>
                 <span className="text-sm font-bold text-warning-400 sm:text-base">
-                  {formatAmount(campaigns.total_revenue_kopeks / 100)} {currencySymbol}
+                  {formatBalance(
+                    tomanOrLegacy(
+                      campaigns.total_revenue_toman,
+                      campaigns.total_revenue_kopeks,
+                      'catalog',
+                    ),
+                  )}
                 </span>
               </div>
             </div>
