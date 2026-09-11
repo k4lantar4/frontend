@@ -18,7 +18,8 @@ export default function AdminWithdrawalReject() {
 
   // Try to get withdrawal summary from navigate state
   const passedDetail = location.state as {
-    amountKopeks?: number;
+    /** Withdrawal amount, Toman 1:1. */
+    amountToman?: number;
     username?: string;
     firstName?: string;
   } | null;
@@ -46,9 +47,9 @@ export default function AdminWithdrawalReject() {
           <h1 className="text-xl font-semibold text-dark-100">
             {t('admin.withdrawals.detail.rejectTitle')}
           </h1>
-          {passedDetail?.amountKopeks != null && passedDetail.amountKopeks > 0 && (
+          {passedDetail?.amountToman != null && passedDetail.amountToman > 0 && (
             <p className="text-sm text-dark-400">
-              #{id} {'\u2022'} {formatWithCurrency(passedDetail.amountKopeks / 100, 0)}
+              #{id} {'\u2022'} {formatWithCurrency(passedDetail.amountToman, 0)}
               {displayName && ` \u2022 ${displayName}`}
             </p>
           )}

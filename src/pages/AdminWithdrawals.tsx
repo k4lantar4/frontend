@@ -41,6 +41,7 @@ export default function AdminWithdrawals() {
   const items = data?.items || [];
 
   const pendingCount = data?.pending_count ?? 0;
+  // Withdrawal amounts, the user's balance and referral earnings are Toman 1:1 — no ÷100.
   const pendingTotal = data?.pending_total_kopeks ?? 0;
 
   return (
@@ -67,7 +68,7 @@ export default function AdminWithdrawals() {
           />
           <StatCard
             label={t('admin.withdrawals.overview.pendingAmount')}
-            value={formatWithCurrency(pendingTotal / 100, 0)}
+            value={formatWithCurrency(pendingTotal, 0)}
             icon={<WalletIcon className="h-5 w-5" />}
             tone="warning"
           />
@@ -122,7 +123,7 @@ export default function AdminWithdrawals() {
                           : item.first_name || `#${item.user_id}`}
                       </span>
                       <span className="font-semibold text-dark-100">
-                        {formatWithCurrency(item.amount_kopeks / 100, 0)}
+                        {formatWithCurrency(item.amount_kopeks, 0)}
                       </span>
                     </div>
 

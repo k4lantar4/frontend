@@ -5,6 +5,7 @@ import type { TrialInfo } from '../../types';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useTheme } from '../../hooks/useTheme';
 import { getGlassColors } from '../../utils/glassTheme';
+import { userCanAfford } from '../../utils/catalogScale';
 import { BoltIcon, SparklesIcon } from '@/components/icons';
 
 interface TrialOfferCardProps {
@@ -27,7 +28,8 @@ export default function TrialOfferCard({
   const { isDark } = useTheme();
   const g = getGlassColors(isDark);
   const isFree = !trialInfo.requires_payment;
-  const canAfford = balanceKopeks >= trialInfo.price_kopeks;
+  // Balance is Toman 1:1; the trial price is catalog-scale (price_rubles = price_kopeks / 100).
+  const canAfford = userCanAfford(balanceKopeks, trialInfo.price_kopeks);
 
   return (
     <div

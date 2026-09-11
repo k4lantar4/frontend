@@ -12,6 +12,7 @@ import { useToast } from './Toast';
 import { useAuthStore } from '../store/auth';
 import { useCurrency } from '../hooks/useCurrency';
 import { useSuccessNotification } from '../store/successNotification';
+import { wsAmountToman } from '../utils/balanceScale';
 
 export default function WebSocketNotifications() {
   const { t } = useTranslation();
@@ -36,8 +37,12 @@ export default function WebSocketNotifications() {
         // Show prominent success modal for balance top-up
         showSuccessModal({
           type: 'balance_topup',
-          amountKopeks: message.amount_kopeks,
-          newBalanceKopeks: message.new_balance_kopeks,
+          // A top-up and the wallet are Toman 1:1 (bot: display_balance_from_storage).
+          amountToman: wsAmountToman(message.amount_rubles, message.amount_kopeks, 'balance'),
+          newBalanceToman:
+            message.new_balance_kopeks != null || message.new_balance_rubles != null
+              ? wsAmountToman(message.new_balance_rubles, message.new_balance_kopeks, 'balance')
+              : undefined,
         });
         // Refresh data
         queryClient.invalidateQueries({ queryKey: ['balance'] });
@@ -48,7 +53,7 @@ export default function WebSocketNotifications() {
       }
 
       if (type === 'balance.change') {
-        const amount = message.amount_rubles ?? (message.amount_kopeks ?? 0) / 100;
+        const amount = wsAmountToman(message.amount_rubles, message.amount_kopeks, 'balance');
         const isPositive = amount >= 0;
         showToast({
           type: isPositive ? 'success' : 'info',
@@ -97,7 +102,7 @@ export default function WebSocketNotifications() {
         // Show prominent success modal for subscription renewal
         showSuccessModal({
           type: 'subscription_renewed',
-          amountKopeks: message.amount_kopeks,
+          amountToman: wsAmountToman(message.amount_rubles, message.amount_kopeks, 'catalog'),
           expiresAt: message.new_expires_at,
         });
         queryClient.invalidateQueries({
@@ -151,7 +156,7 @@ export default function WebSocketNotifications() {
       }
 
       if (type === 'subscription.daily_debit') {
-        const amount = message.amount_rubles ?? (message.amount_kopeks ?? 0) / 100;
+        const amount = wsAmountToman(message.amount_rubles, message.amount_kopeks, 'catalog');
         showToast({
           type: 'info',
           title: t('wsNotifications.subscription.dailyDebitTitle', 'Daily charge'),
@@ -195,7 +200,7 @@ export default function WebSocketNotifications() {
         // Show prominent success modal for device purchase
         showSuccessModal({
           type: 'devices_purchased',
-          amountKopeks: message.amount_kopeks,
+          amountToman: wsAmountToman(message.amount_rubles, message.amount_kopeks, 'catalog'),
           devicesAdded: message.devices_added,
           newDeviceLimit: message.new_device_limit,
         });
@@ -215,7 +220,7 @@ export default function WebSocketNotifications() {
         // Show prominent success modal for traffic purchase
         showSuccessModal({
           type: 'traffic_purchased',
-          amountKopeks: message.amount_kopeks,
+          amountToman: wsAmountToman(message.amount_rubles, message.amount_kopeks, 'catalog'),
           trafficGbAdded: message.traffic_gb_added,
           newTrafficLimitGb: message.new_traffic_limit_gb,
         });
@@ -233,7 +238,7 @@ export default function WebSocketNotifications() {
 
       // Autopay events
       if (type === 'autopay.success') {
-        const amount = message.amount_rubles ?? (message.amount_kopeks ?? 0) / 100;
+        const amount = wsAmountToman(message.amount_rubles, message.amount_kopeks, 'catalog');
         showToast({
           type: 'success',
           title: t('wsNotifications.autopay.successTitle', 'Auto-renewal successful'),
@@ -275,8 +280,8 @@ export default function WebSocketNotifications() {
       }
 
       if (type === 'autopay.insufficient_funds') {
-        const required = message.required_rubles ?? (message.required_kopeks ?? 0) / 100;
-        const balance = message.balance_rubles ?? (message.balance_kopeks ?? 0) / 100;
+        const required = wsAmountToman(message.required_rubles, message.required_kopeks, 'catalog');
+        const balance = wsAmountToman(message.balance_rubles, message.balance_kopeks, 'balance');
         showToast({
           type: 'warning',
           title: t('wsNotifications.autopay.insufficientTitle', 'Insufficient funds'),
@@ -463,7 +468,7 @@ export default function WebSocketNotifications() {
 
       // Referral events
       if (type === 'referral.bonus') {
-        const bonus = message.bonus_rubles ?? (message.bonus_kopeks ?? 0) / 100;
+        const bonus = wsAmountToman(message.bonus_rubles, message.bonus_kopeks, 'balance');
         showToast({
           type: 'success',
           title: t('wsNotifications.referral.bonusTitle', 'Referral bonus'),
@@ -520,7 +525,7 @@ export default function WebSocketNotifications() {
 
       // Payment received
       if (type === 'payment.received') {
-        const amount = message.amount_rubles ?? (message.amount_kopeks ?? 0) / 100;
+        const amount = wsAmountToman(message.amount_rubles, message.amount_kopeks, 'balance');
         showToast({
           type: 'success',
           title: t('wsNotifications.payment.receivedTitle', 'Payment received'),

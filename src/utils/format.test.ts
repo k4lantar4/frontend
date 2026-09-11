@@ -4,7 +4,7 @@ vi.mock('i18next', () => ({
   default: { language: 'fa' },
 }));
 
-import { formatPrice, setExchangeRates, shouldSkipFxConversion } from './format';
+import { formatBalance, formatPrice, setExchangeRates, shouldSkipFxConversion } from './format';
 
 describe('shouldSkipFxConversion', () => {
   it('skips FX for fa and ru (stored amounts are already display units)', () => {
@@ -30,5 +30,21 @@ describe('formatPrice toman skipFx', () => {
     const rendered = formatPrice(1_000_000, 'fa');
     expect(rendered).not.toMatch(/1[59][\s,٬]?9/);
     expect(rendered.replace(/[^\d]/g, '')).toContain('10000');
+  });
+});
+
+describe('formatBalance (Toman 1:1 wallet amounts)', () => {
+  beforeEach(() => {
+    setExchangeRates({ USD: 100, CNY: 14, IRR: 0.00628 });
+  });
+
+  it('shows a 50,000 Toman balance as 50,000 — never ÷100', () => {
+    const rendered = formatBalance(50_000, 'fa');
+    expect(rendered.replace(/[^\d]/g, '')).toBe('50000');
+  });
+
+  it('matches formatPrice of the same amount on the catalog scale', () => {
+    // 1,000,000 Toman balance vs a 100,000,000-kopek (1,000,000 Toman) catalog price.
+    expect(formatBalance(1_000_000, 'fa')).toBe(formatPrice(100_000_000, 'fa'));
   });
 });

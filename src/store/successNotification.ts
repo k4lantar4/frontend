@@ -11,10 +11,10 @@ export type SuccessNotificationType =
 
 export interface SuccessNotificationData {
   type: SuccessNotificationType;
-  /** Amount in kopeks (for balance or subscription price) */
-  amountKopeks?: number;
-  /** New balance in kopeks */
-  newBalanceKopeks?: number;
+  /** Amount in display Toman (top-up credited, or subscription/add-on price) */
+  amountToman?: number;
+  /** New wallet balance in display Toman */
+  newBalanceToman?: number;
   /** Subscription expiry date ISO string */
   expiresAt?: string;
   /** Tariff name */

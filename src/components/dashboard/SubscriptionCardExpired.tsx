@@ -11,6 +11,7 @@ import { useCurrency } from '../../hooks/useCurrency';
 import { useHapticFeedback } from '../../platform/hooks/useHaptic';
 import { getGlassColors } from '../../utils/glassTheme';
 import { getInsufficientBalanceError } from '../../utils/subscriptionHelpers';
+import { userCanAfford } from '../../utils/catalogScale';
 import { ClockIcon, ExclamationIcon, PlusIcon, SubscriptionIcon } from '@/components/icons';
 
 interface SubscriptionCardExpiredProps {
@@ -59,9 +60,12 @@ export default function SubscriptionCardExpired({
    */
   const isInstantRenew = isDisabledDaily || (isDaily && !!subscription.tariff_id);
 
-  // For daily subs, check if balance covers daily price; otherwise 100 kopeks minimum
+  // For daily subs, check if the Toman balance covers the catalog-scale daily price
+  // (same check as the bot's daily resume); otherwise any balance of 100 or more.
   const dailyPrice = subscription.daily_price_kopeks ?? 0;
-  const hasBalance = isDaily ? balanceKopeks >= dailyPrice && dailyPrice > 0 : balanceKopeks >= 100;
+  const hasBalance = isDaily
+    ? dailyPrice > 0 && userCanAfford(balanceKopeks, dailyPrice)
+    : balanceKopeks >= 100;
 
   const handleQuickRenew = async () => {
     setIsRenewing(true);

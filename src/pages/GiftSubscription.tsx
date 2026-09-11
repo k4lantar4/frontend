@@ -29,7 +29,8 @@ import { copyToClipboard } from '../utils/clipboard';
 import { buildGiftClaimArtifacts } from '../utils/giftShare';
 import { getApiErrorMessage } from '../utils/api-error';
 import { formatPeriodLabel } from '../utils/periodLabels';
-import { formatPrice } from '../utils/format';
+import { formatBalance, formatPrice } from '../utils/format';
+import { userCanAfford } from '../utils/catalogScale';
 import { useCurrency } from '../hooks/useCurrency';
 import { usePlatform, useHaptic } from '@/platform';
 import { openPaymentUrl } from '../utils/openPaymentUrl';
@@ -441,7 +442,9 @@ function BuyTabContent({
 
   const currentPrice = selectedPeriod?.price_kopeks ?? 0;
 
-  const insufficientBalance = paymentMode === 'balance' && config.balance_kopeks < currentPrice;
+  // balance_kopeks is Toman 1:1; price_kopeks is a catalog price (×100).
+  const insufficientBalance =
+    paymentMode === 'balance' && !userCanAfford(config.balance_kopeks, currentPrice);
 
   // Validation
   const canSubmit = useMemo(() => {
@@ -521,7 +524,7 @@ function BuyTabContent({
 
   // Balance label with current amount
   const balanceLabel = useMemo(() => {
-    return `${t('gift.fromBalance')} (${formatPrice(config.balance_kopeks)})`;
+    return `${t('gift.fromBalance')} (${formatBalance(config.balance_kopeks)})`;
   }, [config, t]);
 
   const showTariffCards = config.tariffs.length > 1;
@@ -661,7 +664,7 @@ function BuyTabContent({
           <div className="flex items-center justify-between">
             <span className="text-sm text-dark-400">{t('gift.yourBalance')}</span>
             <span className="text-sm font-semibold text-dark-200">
-              {formatPrice(config.balance_kopeks)}
+              {formatBalance(config.balance_kopeks)}
             </span>
           </div>
         </div>

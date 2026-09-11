@@ -81,7 +81,7 @@
   },
   "campaignBonus": {
     "title": "Bonus activated!",
-    "balance": "You received {{amount}} RUB from campaign \"{{name}}\"",
+    "balance": "You received {{amount}} {{currency}} from campaign \"{{name}}\"",
     "subscription": "You received a {{days}}-day subscription from campaign \"{{name}}\"",
     "tariff": "You received tariff \"{{tariff}}\" from campaign \"{{name}}\""
   },
@@ -5694,7 +5694,7 @@
     "chooseSubscription": "Choose which subscription to keep",
     "afterMerge": "After merging",
     "allAuthMethodsMerged": "All sign-in methods will be combined",
-    "balanceSummed": "Balance: {{amount}} ₽ (combined)",
+    "balanceSummed": "Balance: {{amount}} {{currency}} (combined)",
     "unselectedSubscriptionDeleted": "The unselected subscription will be deleted",
     "historyPreserved": "Transaction history will be preserved",
     "confirm": "Merge Accounts",

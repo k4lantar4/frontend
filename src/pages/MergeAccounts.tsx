@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { authApi } from '../api/auth';
 import { useAuthStore } from '../store/auth';
 import { useToast } from '../components/Toast';
+import { useCurrency } from '../hooks/useCurrency';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/data-display/Card';
 import { Button } from '@/components/primitives/Button';
 import { staggerContainer, staggerItem } from '@/components/motion/transitions';
@@ -100,10 +101,6 @@ function formatDate(dateStr: string | null): string {
   }
 }
 
-function formatBalance(kopeks: number): string {
-  return Math.floor(kopeks / 100).toLocaleString(uiLocale());
-}
-
 // -- Radio Indicator --
 
 function RadioIndicator({ selected }: { selected: boolean }) {
@@ -131,6 +128,7 @@ interface AccountCardProps {
 
 function AccountCard({ account, label, isSelected, onSelect, showRadio }: AccountCardProps) {
   const { t } = useTranslation();
+  const { formatAmount, currencySymbol } = useCurrency();
 
   return (
     <Card className={cn('transition-colors', isSelected && 'border-accent-500/50')}>
@@ -182,7 +180,8 @@ function AccountCard({ account, label, isSelected, onSelect, showRadio }: Accoun
         <div className="flex items-baseline gap-1.5">
           <span className="text-sm text-dark-400">{t('merge.balance')}:</span>
           <span className="font-medium text-dark-100">
-            {formatBalance(account.balance_kopeks)} &#8381;
+            {/* balance_kopeks is Toman 1:1 — no ÷100. */}
+            {formatAmount(account.balance_kopeks, 0)} {currencySymbol}
           </span>
         </div>
 
@@ -319,6 +318,7 @@ function ErrorState() {
 
 export default function MergeAccounts() {
   const { t } = useTranslation();
+  const { formatAmount, currencySymbol } = useCurrency();
   const { mergeToken } = useParams<{ mergeToken: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -531,7 +531,10 @@ export default function MergeAccounts() {
               <li className="flex items-start gap-2.5">
                 <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-success-400" />
                 <span className="text-sm text-dark-200">
-                  {t('merge.balanceSummed', { amount: formatBalance(combinedBalance) })}
+                  {t('merge.balanceSummed', {
+                    amount: formatAmount(combinedBalance, 0),
+                    currency: currencySymbol,
+                  })}
                 </span>
               </li>
               {bothHaveSubscriptions && (

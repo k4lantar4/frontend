@@ -75,7 +75,7 @@
   },
   "campaignBonus": {
     "title": "奖励已激活！",
-    "balance": "您从活动「{{name}}」获得了 {{amount}} 卢布",
+    "balance": "您从活动「{{name}}」获得了 {{amount}} {{currency}}",
     "subscription": "您从活动「{{name}}」获得了 {{days}} 天订阅",
     "tariff": "您从活动「{{name}}」获得了套餐「{{tariff}}」"
   },
@@ -5242,7 +5242,7 @@
     "chooseSubscription": "选择要保留的订阅",
     "afterMerge": "合并后",
     "allAuthMethodsMerged": "所有登录方式将合并",
-    "balanceSummed": "余额：{{amount}} ₽（合计）",
+    "balanceSummed": "余额：{{amount}} {{currency}}（合计）",
     "unselectedSubscriptionDeleted": "未选择的订阅将被删除",
     "historyPreserved": "交易记录将保留",
     "confirm": "合并账户",

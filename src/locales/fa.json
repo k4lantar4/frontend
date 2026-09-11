@@ -74,8 +74,8 @@
     "newUserReplyTitle": "پاسخ کاربر"
   },
   "campaignBonus": {
-    "title": "!پاداش فعال شد",
-    "balance": "شما {{amount}} تومان از کمپین «{{name}}» دریافت کردید",
+    "title": "پاداش فعال شد!",
+    "balance": "{{amount}} {{currency}} از کمپین «{{name}}» به موجودی‌تان اضافه شد",
     "subscription": "شما اشتراک {{days}} روزه از کمپین «{{name}}» دریافت کردید",
     "tariff": "شما تعرفه «{{tariff}}» از کمپین «{{name}}» دریافت کردید"
   },
@@ -5261,7 +5261,7 @@
     "chooseSubscription": "اشتراک مورد نظر را انتخاب کنید",
     "afterMerge": "پس از ادغام",
     "allAuthMethodsMerged": "تمام روش‌های ورود ادغام خواهند شد",
-    "balanceSummed": "موجودی: {{amount}} تومان (مجموع)",
+    "balanceSummed": "موجودی دو حساب جمع می‌شود: {{amount}} {{currency}}",
     "unselectedSubscriptionDeleted": "اشتراک انتخاب نشده حذف خواهد شد",
     "historyPreserved": "تاریخچه تراکنش‌ها حفظ خواهد شد",
     "confirm": "ادغام حساب‌ها",
