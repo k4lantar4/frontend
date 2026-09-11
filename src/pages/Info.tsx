@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PiCaretDown } from 'react-icons/pi';
 import DOMPurify from 'dompurify';
 import { infoApi, type FaqPage, type InfoVisibility } from '../api/info';
+import { formatBalance } from '../utils/format';
 import { formatContent } from '../utils/legalContent';
 import { infoPagesApi } from '../api/infoPages';
 import { promoApi, type LoyaltyTierInfo } from '../api/promo';
@@ -567,14 +568,8 @@ export default function Info() {
         return <div className="py-8 text-center text-dark-400">{t('info.noLoyaltyTiers')}</div>;
       }
 
-      const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat(uiLocale(), {
-          style: 'currency',
-          currency: 'RUB',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(amount);
-      };
+      // Loyalty *_rubles are subscription-payment sums and catalog thresholds the bot
+      // already divided by 100: display Toman, so formatBalance with no further ÷100.
 
       const getStatusBadge = (tier: LoyaltyTierInfo) => {
         if (tier.is_current) {
@@ -617,7 +612,7 @@ export default function Info() {
               <div className="rounded-xl bg-dark-800/50 p-3">
                 <div className="mb-1 text-xs text-dark-400">{t('info.totalSpent')}</div>
                 <div className="truncate text-base font-bold text-dark-50 sm:text-lg">
-                  {formatCurrency(loyaltyData.current_spent_rubles)}
+                  {formatBalance(loyaltyData.current_spent_rubles)}
                 </div>
               </div>
               <div className="rounded-xl bg-dark-800/50 p-3">
@@ -637,7 +632,7 @@ export default function Info() {
                   </span>
                   <span>
                     {t('info.toNextStatus')}:{' '}
-                    {formatCurrency(
+                    {formatBalance(
                       Math.max(
                         0,
                         loyaltyData.next_tier_threshold_rubles - loyaltyData.current_spent_rubles,
@@ -691,7 +686,7 @@ export default function Info() {
                     <div className="min-w-0">
                       <h4 className="truncate font-semibold text-dark-50">{tier.name}</h4>
                       <p className="text-xs text-dark-400">
-                        {t('info.threshold')}: {formatCurrency(tier.threshold_rubles)}
+                        {t('info.threshold')}: {formatBalance(tier.threshold_rubles)}
                       </p>
                     </div>
                   </div>
