@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import type { SalesStatsParams } from '../../api/adminSalesStats';
 import { salesStatsApi } from '../../api/adminSalesStats';
 import { SALES_STATS } from '../../constants/salesStats';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 import { BanknotesIcon, PercentIcon, RepeatIcon } from '../../components/icons';
 import { StatCard } from '../stats';
 import { TREND_STYLES } from '../stats/constants';
@@ -18,7 +19,6 @@ interface RenewalsTabProps {
 
 export function RenewalsTab({ params }: RenewalsTabProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['sales-stats', 'renewals', params],
@@ -59,7 +59,9 @@ export function RenewalsTab({ params }: RenewalsTabProps) {
         />
         <StatCard
           label={t('admin.salesStats.renewals.revenue')}
-          value={formatWithCurrency(data.total_revenue_kopeks / SALES_STATS.KOPEKS_DIVISOR, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.total_revenue_toman, data.total_revenue_kopeks, 'catalog'),
+          )}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="success"
         />

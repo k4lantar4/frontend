@@ -13,6 +13,10 @@ export interface SalesStatsParams {
 export interface SalesSummary {
   total_revenue_kopeks: number;
   manual_topup_kopeks: number;
+  /** Display Toman (remnabot#40); the mixed-scale `total_revenue_kopeks` is not. */
+  total_revenue_toman?: number;
+  manual_topup_toman?: number;
+  addon_revenue_toman?: number;
   active_subscriptions: number;
   active_trials: number;
   new_trials: number;
@@ -62,6 +66,7 @@ export interface DailySalesItem {
   date: string;
   count: number;
   revenue_kopeks: number;
+  revenue_toman?: number;
 }
 
 export interface DailyTariffSalesItem {
@@ -74,6 +79,8 @@ export interface SalesStats {
   total_sales: number;
   total_revenue_kopeks: number;
   avg_order_kopeks: number;
+  total_revenue_toman?: number;
+  avg_order_toman?: number;
   top_tariff_name: string;
   by_tariff: SalesByTariffItem[];
   by_period: SalesByPeriodItem[];
@@ -86,6 +93,7 @@ export interface SalesStats {
 export interface RenewalPeriodStats {
   count: number;
   revenue_kopeks: number;
+  revenue_toman?: number;
 }
 
 export interface RenewalChange {
@@ -102,6 +110,7 @@ export interface DailyRenewalItem {
 export interface RenewalsStats {
   total_renewals: number;
   total_revenue_kopeks: number;
+  total_revenue_toman?: number;
   renewal_rate: number;
   current_period: RenewalPeriodStats;
   previous_period: RenewalPeriodStats;
@@ -133,6 +142,8 @@ export interface AddonsStats {
   addon_revenue_kopeks: number;
   device_purchases: number;
   device_revenue_kopeks: number;
+  addon_revenue_toman?: number;
+  device_revenue_toman?: number;
   by_package: AddonByPackageItem[];
   daily: DailyAddonItem[];
   daily_devices: DailyDeviceItem[];
@@ -144,24 +155,30 @@ export interface DepositByMethodItem {
   method: string;
   count: number;
   amount_kopeks: number;
+  amount_toman?: number;
 }
 
 export interface DailyDepositItem {
   date: string;
   count: number;
   amount_kopeks: number;
+  amount_toman?: number;
 }
 
 export interface DailyDepositByMethodItem {
   date: string;
   method: string;
   amount_kopeks: number;
+  amount_toman?: number;
 }
 
 export interface DepositsStats {
   total_deposits: number;
+  /** Mixed scale (Toman deposits + catalog payments); use the `*_toman` twins. */
   total_amount_kopeks: number;
   avg_deposit_kopeks: number;
+  total_amount_toman?: number;
+  avg_deposit_toman?: number;
   by_method: DepositByMethodItem[];
   daily: DailyDepositItem[];
   daily_by_method: DailyDepositByMethodItem[];

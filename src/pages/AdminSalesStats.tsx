@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { SalesStatsParams } from '../api/adminSalesStats';
+import type { SalesStatsParams, SalesSummary } from '../api/adminSalesStats';
 import { salesStatsApi } from '../api/adminSalesStats';
 import { SALES_STATS } from '../constants/salesStats';
-import { useCurrency } from '../hooks/useCurrency';
+import { tomanOrLegacy } from '../utils/balanceScale';
+import { formatBalance } from '../utils/format';
 import { getMonthToDateRange } from '../utils/period';
 import { AdminBackButton } from '../components/admin/AdminBackButton';
 import {
@@ -60,6 +61,15 @@ function getPreviousPeriodParams(period: {
   return null;
 }
 
+/** Summary money cards in display Toman: the bot's `*_toman` twins, else the old ÷100. */
+function summaryToman(s: SalesSummary) {
+  return {
+    revenue: tomanOrLegacy(s.total_revenue_toman, s.total_revenue_kopeks, 'catalog'),
+    addonRevenue: tomanOrLegacy(s.addon_revenue_toman, s.addon_revenue_kopeks, 'catalog'),
+    manualTopup: tomanOrLegacy(s.manual_topup_toman, s.manual_topup_kopeks, 'catalog'),
+  };
+}
+
 function computeDelta(current: number, previous: number): Delta | null {
   if (previous === 0) return current === 0 ? null : { percent: 100, trend: 'up' };
   const percent = Math.round(((current - previous) / previous) * 1000) / 10;
@@ -68,7 +78,6 @@ function computeDelta(current: number, previous: number): Delta | null {
 
 export default function AdminSalesStats() {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const [activeTab, setActiveTab] = useState<TabId>('trials');
   const [period, setPeriod] = useState<{
@@ -111,13 +120,15 @@ export default function AdminSalesStats() {
 
   const deltas = useMemo(() => {
     if (!summary || !prevSummary) return null;
+    const cur = summaryToman(summary);
+    const prev = summaryToman(prevSummary);
     return {
-      revenue: computeDelta(summary.total_revenue_kopeks, prevSummary.total_revenue_kopeks),
+      revenue: computeDelta(cur.revenue, prev.revenue),
       newTrials: computeDelta(summary.new_trials, prevSummary.new_trials),
       newPaid: computeDelta(summary.new_paid_subscriptions, prevSummary.new_paid_subscriptions),
       renewals: computeDelta(summary.renewals_count, prevSummary.renewals_count),
-      addonRevenue: computeDelta(summary.addon_revenue_kopeks, prevSummary.addon_revenue_kopeks),
-      manualTopup: computeDelta(summary.manual_topup_kopeks, prevSummary.manual_topup_kopeks),
+      addonRevenue: computeDelta(cur.addonRevenue, prev.addonRevenue),
+      manualTopup: computeDelta(cur.manualTopup, prev.manualTopup),
     };
   }, [summary, prevSummary]);
 
@@ -169,12 +180,7 @@ export default function AdminSalesStats() {
         <StatCard
           label={t('admin.salesStats.summary.revenue')}
           value={
-            summaryLoading
-              ? '...'
-              : formatWithCurrency(
-                  (summary?.total_revenue_kopeks ?? 0) / SALES_STATS.KOPEKS_DIVISOR,
-                  0,
-                )
+            summaryLoading ? '...' : formatBalance(summary ? summaryToman(summary).revenue : 0)
           }
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="success"
@@ -223,12 +229,7 @@ export default function AdminSalesStats() {
         <StatCard
           label={t('admin.salesStats.summary.addonRevenue')}
           value={
-            summaryLoading
-              ? '...'
-              : formatWithCurrency(
-                  (summary?.addon_revenue_kopeks ?? 0) / SALES_STATS.KOPEKS_DIVISOR,
-                  0,
-                )
+            summaryLoading ? '...' : formatBalance(summary ? summaryToman(summary).addonRevenue : 0)
           }
           icon={<PlusIcon className="h-5 w-5" />}
           tone="accent"
@@ -237,12 +238,7 @@ export default function AdminSalesStats() {
         <StatCard
           label={t('admin.salesStats.summary.manualTopup')}
           value={
-            summaryLoading
-              ? '...'
-              : formatWithCurrency(
-                  (summary?.manual_topup_kopeks ?? 0) / SALES_STATS.KOPEKS_DIVISOR,
-                  0,
-                )
+            summaryLoading ? '...' : formatBalance(summary ? summaryToman(summary).manualTopup : 0)
           }
           icon={<WalletIcon className="h-5 w-5" />}
           tone="warning"

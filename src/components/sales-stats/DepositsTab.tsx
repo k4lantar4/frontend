@@ -6,7 +6,8 @@ import type { SalesStatsParams } from '../../api/adminSalesStats';
 import { salesStatsApi } from '../../api/adminSalesStats';
 import { METHOD_LABELS } from '../../constants/paymentMethods';
 import { SALES_STATS } from '../../constants/salesStats';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 import { BanknotesIcon, CardIcon, WalletIcon } from '../../components/icons';
 import { StatCard } from '../stats';
 
@@ -23,7 +24,6 @@ interface DepositsTabProps {
 
 export function DepositsTab({ params }: DepositsTabProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['sales-stats', 'deposits', params],
@@ -32,14 +32,14 @@ export function DepositsTab({ params }: DepositsTabProps) {
     placeholderData: keepPreviousData,
   });
 
-  const formatValue = useCallback((v: number) => formatWithCurrency(v), [formatWithCurrency]);
+  const formatValue = useCallback((v: number) => formatBalance(v), []);
 
   const methodBreakdown = useMemo(
     () =>
       data?.by_method.map((item) => ({
         key: item.method,
         label: METHOD_LABELS[item.method] || item.method,
-        value: item.amount_kopeks / SALES_STATS.KOPEKS_DIVISOR,
+        value: tomanOrLegacy(item.amount_toman, item.amount_kopeks, 'catalog'),
         icon: <PaymentMethodIcon method={item.method} className="h-5 w-5 shrink-0" />,
       })) ?? [],
     [data?.by_method],
@@ -49,7 +49,7 @@ export function DepositsTab({ params }: DepositsTabProps) {
     () =>
       data?.daily.map((item) => ({
         date: item.date,
-        value: item.amount_kopeks / SALES_STATS.KOPEKS_DIVISOR,
+        value: tomanOrLegacy(item.amount_toman, item.amount_kopeks, 'catalog'),
       })) ?? [],
     [data?.daily],
   );
@@ -59,7 +59,7 @@ export function DepositsTab({ params }: DepositsTabProps) {
       data?.daily_by_method.map((i) => ({
         date: i.date,
         key: METHOD_LABELS[i.method] || i.method,
-        value: i.amount_kopeks / SALES_STATS.KOPEKS_DIVISOR,
+        value: tomanOrLegacy(i.amount_toman, i.amount_kopeks, 'catalog'),
       })) ?? [],
     [data?.daily_by_method],
   );
@@ -83,13 +83,17 @@ export function DepositsTab({ params }: DepositsTabProps) {
         />
         <StatCard
           label={t('admin.salesStats.deposits.totalAmount')}
-          value={formatWithCurrency(data.total_amount_kopeks / SALES_STATS.KOPEKS_DIVISOR, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.total_amount_toman, data.total_amount_kopeks, 'catalog'),
+          )}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="success"
         />
         <StatCard
           label={t('admin.salesStats.deposits.avgDeposit')}
-          value={formatWithCurrency(data.avg_deposit_kopeks / SALES_STATS.KOPEKS_DIVISOR)}
+          value={formatBalance(
+            tomanOrLegacy(data.avg_deposit_toman, data.avg_deposit_kopeks, 'catalog'),
+          )}
           icon={<CardIcon className="h-5 w-5" />}
           tone="neutral"
         />

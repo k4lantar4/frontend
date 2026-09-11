@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import type { SalesStatsParams } from '../../api/adminSalesStats';
 import { salesStatsApi } from '../../api/adminSalesStats';
 import { SALES_STATS } from '../../constants/salesStats';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 import { BanknotesIcon, CardIcon, TicketIcon, TrophyIcon } from '../../components/icons';
 import { StatCard } from '../stats';
 
@@ -21,7 +22,6 @@ interface SalesTabProps {
 
 export function SalesTab({ params }: SalesTabProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['sales-stats', 'sales', params],
@@ -58,7 +58,7 @@ export function SalesTab({ params }: SalesTabProps) {
 
   const dailyData = data.daily.map((item) => ({
     date: item.date,
-    value: item.revenue_kopeks / SALES_STATS.KOPEKS_DIVISOR,
+    value: tomanOrLegacy(item.revenue_toman, item.revenue_kopeks, 'catalog'),
   }));
 
   return (
@@ -72,13 +72,17 @@ export function SalesTab({ params }: SalesTabProps) {
         />
         <StatCard
           label={t('admin.salesStats.sales.totalRevenue')}
-          value={formatWithCurrency(data.total_revenue_kopeks / SALES_STATS.KOPEKS_DIVISOR, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.total_revenue_toman, data.total_revenue_kopeks, 'catalog'),
+          )}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="success"
         />
         <StatCard
           label={t('admin.salesStats.sales.avgOrder')}
-          value={formatWithCurrency(data.avg_order_kopeks / SALES_STATS.KOPEKS_DIVISOR)}
+          value={formatBalance(
+            tomanOrLegacy(data.avg_order_toman, data.avg_order_kopeks, 'catalog'),
+          )}
           icon={<CardIcon className="h-5 w-5" />}
           tone="success"
         />
