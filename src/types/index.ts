@@ -341,6 +341,8 @@ export interface Tariff {
   traffic_reset_mode?: string;
   // Multi-tariff: already purchased by user
   is_purchased?: boolean;
+  // false when the bot refuses to switch the current subscription to this tariff by direction
+  switch_allowed?: boolean;
 }
 
 export interface TariffsPurchaseOptions {

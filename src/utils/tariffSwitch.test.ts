@@ -1,6 +1,11 @@
 import { AxiosError, AxiosHeaders } from 'axios';
 import { describe, expect, it } from 'vitest';
-import { canSwitchTariff, tariffSwitchErrorKey, type TariffSwitchContext } from './tariffSwitch';
+import {
+  canSwitchTariff,
+  isSwitchBlockedByDirection,
+  tariffSwitchErrorKey,
+  type TariffSwitchContext,
+} from './tariffSwitch';
 
 const activePaid = { tariff_id: 2, is_trial: false, is_active: true, is_limited: false };
 
@@ -13,6 +18,7 @@ const ctx = (overrides: Partial<TariffSwitchContext> = {}): TariffSwitchContext 
   isSubscriptionExpired: false,
   isOnFreeTariff: false,
   targetOwned: false,
+  switchAllowed: true,
   ...overrides,
 });
 
@@ -68,6 +74,27 @@ describe('canSwitchTariff', () => {
   });
 });
 
+describe('switch direction (F-001)', () => {
+  it('a tariff the bot would refuse by direction is not switchable', () => {
+    expect(canSwitchTariff(ctx({ switchAllowed: false }))).toBe(false);
+  });
+
+  it('is hidden only when the direction is the one thing blocking the switch', () => {
+    expect(isSwitchBlockedByDirection(ctx({ switchAllowed: false }))).toBe(true);
+    expect(isSwitchBlockedByDirection(ctx())).toBe(false);
+  });
+
+  it('a card that goes to purchase anyway stays visible', () => {
+    const blocked = { switchAllowed: false };
+    expect(isSwitchBlockedByDirection(ctx({ ...blocked, isSubscriptionExpired: true }))).toBe(
+      false,
+    );
+    expect(isSwitchBlockedByDirection(ctx({ ...blocked, isNewPurchase: true }))).toBe(false);
+    expect(isSwitchBlockedByDirection(ctx({ ...blocked, isCurrentTariff: true }))).toBe(false);
+    expect(isSwitchBlockedByDirection(ctx({ ...blocked, isOnFreeTariff: true }))).toBe(false);
+  });
+});
+
 const apiError = (status: number, detail: unknown) =>
   new AxiosError('Request failed', String(status), undefined, undefined, {
     status,
@@ -93,6 +120,22 @@ describe('tariffSwitchErrorKey', () => {
     expect(tariffSwitchErrorKey(apiError(403, 'Повышение тарифа недоступно'))).toBe(
       'subscription.switchTariff.errors.upgradeDisabled',
     );
+  });
+
+  it('403: direction refusal sent as a code', () => {
+    expect(
+      tariffSwitchErrorKey(
+        apiError(403, {
+          code: 'tariff_downgrade_disabled',
+          message: 'Tariff downgrade is disabled',
+        }),
+      ),
+    ).toBe('subscription.switchTariff.errors.downgradeDisabled');
+    expect(
+      tariffSwitchErrorKey(
+        apiError(403, { code: 'tariff_upgrade_disabled', message: 'Tariff upgrade is disabled' }),
+      ),
+    ).toBe('subscription.switchTariff.errors.upgradeDisabled');
   });
 
   it('other 403s: the tariff is not available to this user', () => {

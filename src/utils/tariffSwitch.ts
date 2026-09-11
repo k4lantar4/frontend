@@ -22,6 +22,12 @@ export interface TariffSwitchContext {
   isOnFreeTariff: boolean;
   /** The user already owns the target tariff as another alive subscription (`is_purchased`). */
   targetOwned: boolean;
+  /**
+   * The bot's own verdict on the switch direction (`tariff.switch_allowed !== false`): with
+   * downgrades disabled it refuses cheaper and equal-price targets, which the cabinet can't
+   * work out itself (it depends on remaining days and the user's discounts).
+   */
+  switchAllowed: boolean;
 }
 
 /**
@@ -30,7 +36,7 @@ export interface TariffSwitchContext {
  * as the bot does. The unbound page still buys, so an extra subscription can be
  * bought.
  */
-export function canSwitchTariff(c: TariffSwitchContext): boolean {
+function switchesApartFromDirection(c: TariffSwitchContext): boolean {
   if (c.isNewPurchase) return false;
   if (c.isMultiTariff && (c.boundSubscriptionId == null || c.targetOwned)) return false;
   const sub = c.subscription;
@@ -41,7 +47,24 @@ export function canSwitchTariff(c: TariffSwitchContext): boolean {
   return sub.is_active || sub.is_limited;
 }
 
-// The bot sends these refusals as plain (non-localized) detail strings.
+export function canSwitchTariff(c: TariffSwitchContext): boolean {
+  return c.switchAllowed && switchesApartFromDirection(c);
+}
+
+/**
+ * The card would offer «تغییر» but the bot refuses that direction — hide it, as the bot
+ * hides such tariffs from its own switch list. Cards that go to purchase stay visible.
+ */
+export function isSwitchBlockedByDirection(c: TariffSwitchContext): boolean {
+  return !c.switchAllowed && switchesApartFromDirection(c);
+}
+
+const DIRECTION_ERROR_KEYS: Record<string, string> = {
+  tariff_downgrade_disabled: 'subscription.switchTariff.errors.downgradeDisabled',
+  tariff_upgrade_disabled: 'subscription.switchTariff.errors.upgradeDisabled',
+};
+
+// Bots before the coded refusals sent these plain (non-localized) detail strings.
 const DOWNGRADE_DISABLED_DETAIL = 'Понижение тарифа недоступно';
 const UPGRADE_DISABLED_DETAIL = 'Повышение тарифа недоступно';
 
@@ -55,6 +78,9 @@ export function tariffSwitchErrorKey(error: unknown): string | null {
   const detail: unknown = error.response?.data?.detail;
   if (status === 409) return 'subscription.switchTariff.errors.alreadyOwned';
   if (status === 403) {
+    const code =
+      detail && typeof detail === 'object' ? (detail as { code?: unknown }).code : undefined;
+    if (typeof code === 'string' && code in DIRECTION_ERROR_KEYS) return DIRECTION_ERROR_KEYS[code];
     if (detail === DOWNGRADE_DISABLED_DETAIL)
       return 'subscription.switchTariff.errors.downgradeDisabled';
     if (detail === UPGRADE_DISABLED_DETAIL)
