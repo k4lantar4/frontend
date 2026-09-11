@@ -6,6 +6,7 @@ import { AdminBackButton } from '../components/admin';
 import { SettingsIcon } from '@/components/icons';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
 import type { ReferralRewardLevel } from '../types';
+import { normalizeTomanInput } from '../utils/tomanInput';
 
 /**
  * Reward levels of the referral chain.
@@ -455,9 +456,9 @@ export default function AdminReferralLevels() {
                 />
                 <NumberField
                   label={t('admin.referralLevels.fixedAmount')}
-                  value={level.referrer_fixed_kopeks ? level.referrer_fixed_kopeks / 100 : ''}
+                  amount
+                  value={level.referrer_fixed_kopeks || ''}
                   disabled={level.reward_mode === 'days'}
-                  scale={100}
                   onCommit={(parsed) => save(level.level, { referrer_fixed_kopeks: parsed })}
                   onInvalid={(name) =>
                     setSaveError(t('admin.referralLevels.invalidValue', { field: name }))
@@ -500,9 +501,9 @@ export default function AdminReferralLevels() {
                 </div>
                 <NumberField
                   label={t('admin.referralLevels.fixedAmount')}
-                  value={level.referee_fixed_kopeks ? level.referee_fixed_kopeks / 100 : ''}
+                  amount
+                  value={level.referee_fixed_kopeks || ''}
                   disabled={level.reward_mode === 'days'}
-                  scale={100}
                   onCommit={(parsed) => save(level.level, { referee_fixed_kopeks: parsed })}
                   onInvalid={(name) =>
                     setSaveError(t('admin.referralLevels.invalidValue', { field: name }))
@@ -609,7 +610,7 @@ function NumberField({
   value,
   disabled,
   max,
-  scale = 1,
+  amount = false,
   onCommit,
   onInvalid,
 }: {
@@ -618,8 +619,8 @@ function NumberField({
   disabled?: boolean;
   /** Upper bound; values above it are rejected with a message. */
   max?: number;
-  /** 1 for plain integers, 100 for money entered in rubles and stored in kopeks. */
-  scale?: number;
+  /** Toman amount (stored 1:1): thousands separators, Persian digits and «تومان» accepted. */
+  amount?: boolean;
   /** Receives the parsed value, or null for "not granted". */
   onCommit: (parsed: number | null) => void;
   onInvalid: (message: string) => void;
@@ -641,7 +642,10 @@ function NumberField({
         // that re-renders the whole list, and firing one per character would both
         // hammer the API and fight the cursor.
         onBlur={(e) => {
-          const raw = e.target.value.trim().replace(',', '.');
+          // A Toman amount has no decimals: «,» is a thousands separator there.
+          const raw = amount
+            ? normalizeTomanInput(e.target.value)
+            : e.target.value.trim().replace(',', '.');
           // Empty means "not granted" — the same as zero. Without this the field
           // could not be cleared at all and the level kept paying the old value.
           if (raw === '') return onCommit(null);
@@ -650,7 +654,7 @@ function NumberField({
           if (!Number.isFinite(parsed) || parsed < 0) {
             return onInvalid(label);
           }
-          const stored = Math.round(parsed * scale);
+          const stored = Math.round(parsed);
           if (max !== undefined && stored > max) {
             return onInvalid(label);
           }

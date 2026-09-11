@@ -3433,6 +3433,8 @@
           "subtract": "کسر",
           "addByAdmin": "افزوده شده توسط مدیر",
           "subtractByAdmin": "کسر شده توسط مدیر",
+          "updateError": "موجودی تغییر نکرد. دوباره تلاش کنید.",
+          "updateLimit": "موجودی تغییر نکرد؛ هر بار حداکثر 10,000,000 تومان می‌شود اضافه یا کم کرد.",
           "recentTransactions": "تراکنش‌های اخیر"
         },
         "sync": {
@@ -4606,7 +4608,7 @@
       "toReferrer": "به معرف",
       "toReferee": "به کاربر دعوت‌شده",
       "percent": "درصد از مبلغ",
-      "fixedAmount": "مبلغ ثابت",
+      "fixedAmount": "مبلغ ثابت (تومان)",
       "days": "روزهای اشتراک",
       "tariff": "تعرفه",
       "mainSubscription": "اشتراک اصلی",

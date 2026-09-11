@@ -208,12 +208,24 @@ describe('очистка полей', () => {
 });
 
 describe('единицы измерения', () => {
-  it('деньги вводятся в рублях, а уходят в копейках', async () => {
+  // Бот начисляет фиксированную сумму на баланс 1:1 (Toman), так что поле уходит как введено.
+  it('фиксированная сумма вводится и уходит в томанах как есть', async () => {
     await renderEditor();
-    blur('Фикс. сумма', '150,50');
+    blur('Фикс. сумма', '150000');
     await waitFor(() => expect(state.saves).toHaveLength(1));
-    expect(state.saves[0]).toEqual({ level: 1, patch: { referrer_fixed_kopeks: 15050 } });
+    expect(state.saves[0]).toEqual({ level: 1, patch: { referrer_fixed_kopeks: 150000 } });
   });
+
+  // Запятая в сумме в томанах — разделитель тысяч; «150,000» раньше сохранялось как 150.
+  it.each(['150,000', '۱۵۰۰۰۰', '150 000 تومان'])(
+    'сумма «%s» сохраняется как 150000',
+    async (typed) => {
+      await renderEditor();
+      blur('Фикс. сумма', typed);
+      await waitFor(() => expect(state.saves).toHaveLength(1));
+      expect(state.saves[0]).toEqual({ level: 1, patch: { referrer_fixed_kopeks: 150000 } });
+    },
+  );
 
   it('дни остаются целым числом', async () => {
     await renderEditor();

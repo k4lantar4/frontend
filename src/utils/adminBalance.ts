@@ -33,3 +33,22 @@ export function paymentsTotalToman(toman: number | null | undefined, legacyKopek
   if (toman != null) return toman;
   return catalogPriceInToman(legacyKopeks);
 }
+
+/**
+ * Message key for a failed admin balance edit. The API answers 422 on an amount
+ * above the per-edit cap (10,000,000 Toman); any other failure gets the generic text.
+ */
+export function adminBalanceErrorKey(error: unknown): string {
+  const response = (
+    error as { response?: { status?: number; data?: { detail?: unknown } } } | undefined
+  )?.response;
+  const detail = Array.isArray(response?.data?.detail) ? response.data.detail : [];
+  const amountRefused = detail.some(
+    (item: { loc?: unknown[] }) =>
+      Array.isArray(item?.loc) &&
+      item.loc.some((part) => part === 'amount_display' || part === 'amount_kopeks'),
+  );
+  return response?.status === 422 && amountRefused
+    ? 'admin.users.detail.balance.updateLimit'
+    : 'admin.users.detail.balance.updateError';
+}
