@@ -3413,6 +3413,8 @@
           "subtract": "扣除",
           "addByAdmin": "管理员充值",
           "subtractByAdmin": "管理员扣除",
+          "updateError": "余额未更改，请重试。",
+          "updateLimit": "余额未更改：单次最多 10,000,000 托曼。",
           "recentTransactions": "最近交易"
         },
         "sync": {
@@ -4586,7 +4588,7 @@
       "toReferrer": "给推荐人",
       "toReferee": "给被邀请人",
       "percent": "金额百分比",
-      "fixedAmount": "固定金额",
+      "fixedAmount": "固定金额（托曼）",
       "days": "订阅天数",
       "tariff": "套餐",
       "mainSubscription": "主订阅",

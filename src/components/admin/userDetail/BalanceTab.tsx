@@ -6,7 +6,7 @@ import { adminUsersApi, type UserDetailResponse } from '../../../api/adminUsers'
 import { promocodesApi } from '../../../api/promocodes';
 import { promoOffersApi } from '../../../api/promoOffers';
 import { createNumberInputHandler, toNumber } from '../../../utils/inputHelpers';
-import { adminBalanceUpdatePayload } from '../../../utils/adminBalance';
+import { adminBalanceErrorKey, adminBalanceUpdatePayload } from '../../../utils/adminBalance';
 import { PlusIcon, MinusIcon } from '@/components/icons';
 
 // ──────────────────────────────────────────────────────────────────
@@ -80,6 +80,8 @@ export function BalanceTab({
       setBalanceDescription('');
     } catch (error) {
       console.error('Failed to update balance:', error);
+      // The API refuses one edit above 10,000,000 Toman with a 422 — say so instead of doing nothing.
+      notify.error(t(adminBalanceErrorKey(error)), t('common.error'));
     } finally {
       setActionLoading(false);
     }

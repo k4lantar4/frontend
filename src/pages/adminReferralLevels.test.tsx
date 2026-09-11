@@ -216,6 +216,17 @@ describe('единицы измерения', () => {
     expect(state.saves[0]).toEqual({ level: 1, patch: { referrer_fixed_kopeks: 150000 } });
   });
 
+  // Запятая в сумме в томанах — разделитель тысяч; «150,000» раньше сохранялось как 150.
+  it.each(['150,000', '۱۵۰۰۰۰', '150 000 تومان'])(
+    'сумма «%s» сохраняется как 150000',
+    async (typed) => {
+      await renderEditor();
+      blur('Фикс. сумма', typed);
+      await waitFor(() => expect(state.saves).toHaveLength(1));
+      expect(state.saves[0]).toEqual({ level: 1, patch: { referrer_fixed_kopeks: 150000 } });
+    },
+  );
+
   it('дни остаются целым числом', async () => {
     await renderEditor();
     blur('Дни', '7');

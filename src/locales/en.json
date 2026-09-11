@@ -3998,6 +3998,8 @@
           "subtract": "Deduct",
           "addByAdmin": "Added by admin",
           "subtractByAdmin": "Deducted by admin",
+          "updateError": "Balance was not changed. Please try again.",
+          "updateLimit": "Balance was not changed: one edit can be at most 10,000,000 Toman.",
           "recentTransactions": "Recent transactions"
         },
         "sync": {
@@ -4872,7 +4874,7 @@
       "toReferrer": "To the referrer",
       "toReferee": "To the invited user",
       "percent": "Percent of the amount",
-      "fixedAmount": "Fixed amount",
+      "fixedAmount": "Fixed amount (Toman)",
       "days": "Subscription days",
       "tariff": "Tariff",
       "mainSubscription": "main subscription",
