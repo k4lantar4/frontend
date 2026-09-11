@@ -2,7 +2,12 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionApi } from '../../../api/subscription';
-import { getErrorMessage, getFlagEmoji } from '../../../utils/subscriptionHelpers';
+import {
+  getErrorMessage,
+  getFlagEmoji,
+  getInsufficientBalanceError,
+} from '../../../utils/subscriptionHelpers';
+import { missingToman, userCanAfford } from '../../../utils/catalogScale';
 import InsufficientBalancePrompt from '../../InsufficientBalancePrompt';
 import { ChevronRightIcon } from '../../icons';
 import type { PurchaseOptions, Subscription } from '../../../types';
@@ -238,10 +243,13 @@ export function ServerManagementSheet({
             const hasChanges = added.length > 0 || removed.length > 0;
 
             const addedServers = countriesData.countries.filter((c) => added.includes(c.uuid));
+            // totalCost is catalog kopeks (Toman x 100); the wallet balance is Toman 1:1.
             const totalCost = addedServers.reduce((sum, s) => sum + s.price_kopeks, 0);
             const hasEnoughBalance =
-              !purchaseOptions || totalCost <= purchaseOptions.balance_kopeks;
-            const missingAmount = purchaseOptions ? totalCost - purchaseOptions.balance_kopeks : 0;
+              !purchaseOptions || userCanAfford(purchaseOptions.balance_kopeks, totalCost);
+            const missingAmount = purchaseOptions
+              ? missingToman(purchaseOptions.balance_kopeks, totalCost)
+              : 0;
 
             return hasChanges ? (
               <div
@@ -282,7 +290,11 @@ export function ServerManagementSheet({
                 )}
 
                 {totalCost > 0 && !hasEnoughBalance && missingAmount > 0 && (
-                  <InsufficientBalancePrompt missingAmountKopeks={missingAmount} compact />
+                  <InsufficientBalancePrompt
+                    missingAmountKopeks={missingAmount}
+                    amountScale="toman"
+                    compact
+                  />
                 )}
 
                 <button
@@ -310,11 +322,21 @@ export function ServerManagementSheet({
             );
           })()}
 
-          {updateMutation.isError && (
-            <div className="text-center text-sm text-error-400">
-              {getErrorMessage(updateMutation.error)}
-            </div>
-          )}
+          {updateMutation.isError &&
+            (getInsufficientBalanceError(updateMutation.error) ? (
+              // 402 from the bot: `missing_amount` is Toman (bot #37).
+              <InsufficientBalancePrompt
+                missingAmountKopeks={
+                  getInsufficientBalanceError(updateMutation.error)?.missingAmount || 0
+                }
+                amountScale="toman"
+                compact
+              />
+            ) : (
+              <div className="text-center text-sm text-error-400">
+                {getErrorMessage(updateMutation.error)}
+              </div>
+            ))}
         </div>
       ) : (
         <div className="py-4 text-center text-sm text-dark-400">

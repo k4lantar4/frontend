@@ -11,7 +11,10 @@ import TrafficProgressBar from '../components/dashboard/TrafficProgressBar';
 import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
 import { useTrafficZone } from '../hooks/useTrafficZone';
 import { getSubscriptionDisplayLabel } from '../utils/subscriptionDisplayLabel';
-import { NEW_PURCHASE_PATH } from '../components/subscription/purchase/purchaseRoutes';
+import {
+  NEW_PURCHASE_PATH,
+  switchTariffPath,
+} from '../components/subscription/purchase/purchaseRoutes';
 import { TrafficUsageText } from '../components/subscription/TrafficUsageText';
 import { getGlassColors } from '../utils/glassTheme';
 import { copyToClipboard } from '../utils/clipboard';
@@ -1857,6 +1860,22 @@ export default function Subscription() {
             <h2 className="mb-4 text-base font-bold tracking-tight text-dark-50">
               {t('subscription.additionalOptions.title')}
             </h2>
+
+            {/* Switch this subscription's tariff, as the bot's «📦 تعرفه» button does
+                (fork change: upstream only buys another subscription in multi-tariff mode). */}
+            {isMultiTariff &&
+              !!subscription.tariff_id &&
+              (subscription.is_active || subscription.is_limited) && (
+                <Link
+                  to={switchTariffPath(subscription.id)}
+                  className="mb-4 block w-full rounded-xl border p-4 text-start"
+                >
+                  <div className="font-medium">{t('subscription.switchTariff.title')}</div>
+                  <div className="mt-1 text-sm text-dark-400">
+                    {t('subscription.switchTariff.entryHint')}
+                  </div>
+                </Link>
+              )}
 
             {isMultiTariff && (
               <Link

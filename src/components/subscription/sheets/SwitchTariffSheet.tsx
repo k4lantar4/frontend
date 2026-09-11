@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { subscriptionApi } from '../../../api/subscription';
-import { getErrorMessage } from '../../../utils/subscriptionHelpers';
+import { getErrorMessage, getInsufficientBalanceError } from '../../../utils/subscriptionHelpers';
+import { tariffSwitchErrorKey } from '../../../utils/tariffSwitch';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { usePromoDiscount } from '../../../hooks/usePromoDiscount';
 import { dailyPriceQuote } from '../purchase/dailyPrice';
@@ -81,10 +82,24 @@ export function SwitchTariffSheet({
       ? t('subscription.free', 'Бесплатно')
       : `${formatAmount(kopeks / 100)} ${currencySymbol}`;
 
-  const { data: switchPreview, isLoading: switchPreviewLoading } = useQuery({
-    queryKey: ['tariff-switch-preview', tariffId],
+  // The bot refuses some switches with a bare status + non-localized detail
+  // (409 target already owned, 403 direction disabled) — say it in our words.
+  const switchErrorText = (error: unknown) => {
+    const key = tariffSwitchErrorKey(error);
+    return key ? t(key) : getErrorMessage(error);
+  };
+
+  const {
+    data: switchPreview,
+    isLoading: switchPreviewLoading,
+    error: switchPreviewError,
+  } = useQuery({
+    // Per subscription: in multi-tariff mode the same target tariff costs differently per source.
+    queryKey: ['tariff-switch-preview', tariffId, subscriptionId],
     queryFn: () => subscriptionApi.previewTariffSwitch(tariffId!, subscriptionId),
     enabled: !!tariffId,
+    // Refusals (409/403/400) are deterministic — show them without a retry delay.
+    retry: false,
   });
 
   const switchMutation = useMutation({
@@ -92,6 +107,7 @@ export function SwitchTariffSheet({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscription', subscriptionId] });
       queryClient.invalidateQueries({ queryKey: ['purchase-options', subscriptionId] });
+      queryClient.invalidateQueries({ queryKey: ['subscriptions-list'] });
       onClose();
       navigate('/subscriptions', { replace: true });
     },
@@ -139,6 +155,10 @@ export function SwitchTariffSheet({
         <SkeletonGroup className="space-y-3">
           <Skeleton variant="card" count={3} className="h-16" />
         </SkeletonGroup>
+      ) : switchPreviewError && !switchPreview ? (
+        <div className="text-center text-sm text-error-400">
+          {switchErrorText(switchPreviewError)}
+        </div>
       ) : (
         switchPreview &&
         (() => {
@@ -242,9 +262,22 @@ export function SwitchTariffSheet({
                   if (shouldUsePurchaseFlow(switchMutation.error)) {
                     return null;
                   }
+                  // 402: `missing_amount` is Toman (bot #37), not catalog kopeks.
+                  const insufficient = getInsufficientBalanceError(switchMutation.error);
+                  if (insufficient) {
+                    return (
+                      <div className="mt-3">
+                        <InsufficientBalancePrompt
+                          missingAmountKopeks={insufficient.missingAmount || 0}
+                          amountScale="toman"
+                          compact
+                        />
+                      </div>
+                    );
+                  }
                   return (
                     <div className="mt-3 text-center text-sm text-error-400">
-                      {getErrorMessage(switchMutation.error)}
+                      {switchErrorText(switchMutation.error)}
                     </div>
                   );
                 })()}

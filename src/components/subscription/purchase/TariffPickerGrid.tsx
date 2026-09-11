@@ -6,6 +6,7 @@ import { useCurrency } from '../../../hooks/useCurrency';
 import { usePromoDiscount } from '../../../hooks/usePromoDiscount';
 import { dailyPriceQuote } from './dailyPrice';
 import { getGlassColors } from '../../../utils/glassTheme';
+import { canSwitchTariff } from '../../../utils/tariffSwitch';
 import { ArrowDownIcon, DevicesIcon, RestartIcon } from '@/components/icons';
 import type { Tariff, Subscription, PurchaseOptions } from '../../../types';
 
@@ -30,6 +31,11 @@ export interface TariffPickerGridProps {
   purchaseOptions: PurchaseOptions | undefined;
   isTariffsMode: boolean;
   isMultiTariff: boolean;
+  /**
+   * The existing subscription this page acts on (`?subscriptionId=`). In
+   * multi-tariff mode other tariffs offer switch only when it is set.
+   */
+  subscriptionId?: number;
   /** When `new`, show purchase labels and skip legacy/renew branches. */
   purchaseIntent?: 'new' | 'renew';
   onSelectTariff: (tariff: Tariff) => void;
@@ -42,6 +48,7 @@ export function TariffPickerGrid({
   purchaseOptions,
   isTariffsMode,
   isMultiTariff,
+  subscriptionId,
   purchaseIntent,
   onSelectTariff,
   onSwitchTariff,
@@ -153,16 +160,16 @@ export function TariffPickerGrid({
               purchaseOptions &&
               'subscription_on_free_tariff' in purchaseOptions &&
               purchaseOptions.subscription_on_free_tariff === true;
-            const canSwitch =
-              !isNewPurchase &&
-              !isMultiTariff &&
-              subscription &&
-              subscription.tariff_id &&
-              !isCurrentTariff &&
-              !subscription.is_trial &&
-              !isSubscriptionExpired &&
-              !isOnFreeTariff &&
-              (subscription.is_active || subscription.is_limited);
+            const canSwitch = canSwitchTariff({
+              isNewPurchase,
+              isMultiTariff,
+              boundSubscriptionId: subscriptionId,
+              subscription,
+              isCurrentTariff,
+              isSubscriptionExpired: !!isSubscriptionExpired,
+              isOnFreeTariff: !!isOnFreeTariff,
+              targetOwned: !!tariff.is_purchased,
+            });
             const isLegacySubscription =
               !isNewPurchase && subscription && !subscription.is_trial && !subscription.tariff_id;
 

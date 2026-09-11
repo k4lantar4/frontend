@@ -148,9 +148,15 @@ export default function SubscriptionPurchase() {
             ? t('subscription.newTariff', 'Новый тариф')
             : !isMultiTariff && subscription?.is_daily && !subscription?.is_trial
               ? t('subscription.switchTariff.title')
-              : subscription && !subscription.is_trial
-                ? t('subscription.extend')
-                : t('subscription.getSubscription')}
+              : isMultiTariff &&
+                  subscription &&
+                  !subscription.is_trial &&
+                  (subscription.is_active || subscription.is_limited)
+                ? // Bound to an active subscription: the grid switches it (renewal has its own page).
+                  t('subscription.switchTariff.title')
+                : subscription && !subscription.is_trial
+                  ? t('subscription.extend')
+                  : t('subscription.getSubscription')}
         </h1>
       </div>
 
@@ -278,6 +284,7 @@ export default function SubscriptionPurchase() {
               purchaseOptions={purchaseOptions}
               isTariffsMode={isTariffsMode}
               isMultiTariff={isMultiTariff}
+              subscriptionId={effectiveSubscriptionId}
               purchaseIntent={isNewPurchase ? 'new' : 'renew'}
               onSelectTariff={(tariff) => {
                 setSelectedTariff(tariff);
