@@ -23,7 +23,7 @@
     "copy": "کپی",
     "units": {
       "tb": "TB",
-      "gb": "GB",
+      "gb": "گیگ",
       "mb": "MB"
     },
     "add": "افزودن",
@@ -337,6 +337,7 @@
     "expiresAt": "تاریخ انقضا",
     "daysLeft": "روز باقی‌مانده",
     "devices": "تعداد کاربر",
+    "devices_one": "{{count}} کاربر",
     "devices_other": "{{count}} کاربر",
     "extraDevices": "کاربران اضافی",
     "extraDevicesIncluded": "شامل {{count}} کاربر اضافی",
@@ -350,7 +351,7 @@
       "DAY": "بازنشانی روزانه",
       "WEEK": "بازنشانی هفتگی",
       "MONTH": "بازنشانی ماهانه",
-      "MONTH_ROLLING": "بازنشانی هر ۳۰ روز"
+      "MONTH_ROLLING": "بازنشانی هر 30 روز"
     },
     "traffic": "ترافیک",
     "volumeEmptyHint": "هنوز مصرفی ثبت نشده — کل حجم در دسترس است",
@@ -394,7 +395,7 @@
     "perDevice": "/ کاربر",
     "summary": {
       "period": "دوره: {{label}}",
-      "traffic": "ترافیک: {{gb}} GB"
+      "traffic": "ترافیک: {{gb}} گیگ"
     },
     "total": "جمع کل",
     "purchase": "خرید",
