@@ -51,10 +51,23 @@ export function shouldSkipFxConversion(lang?: string): boolean {
   }
 }
 
+/** Catalog price (`price_kopeks`, stored ×100) → display currency. */
 export function formatPrice(kopeks: number, lang?: string): string {
+  return formatDisplayAmount(kopeks / 100, lang);
+}
+
+/**
+ * Wallet amount (`balance_kopeks`, bonuses, withdrawals — stored Toman 1:1 despite
+ * the name) → display currency. Same rendering as formatPrice, without the ÷100.
+ */
+export function formatBalance(toman: number, lang?: string): string {
+  return formatDisplayAmount(Number.isFinite(toman) ? toman : 0, lang);
+}
+
+function formatDisplayAmount(displayAmount: number, lang?: string): string {
   const resolvedLang = lang || i18next.language || 'ru';
   const config = LANG_CURRENCY_MAP[resolvedLang] || DEFAULT_CURRENCY;
-  let amount = kopeks / 100;
+  let amount = displayAmount;
 
   // Конвертация по курсу для не-рублёвых локалей. Без rates fallback на сырую сумму
   // (поведение до фикса), чтобы первый рендер до загрузки курсов не отдавал NaN.

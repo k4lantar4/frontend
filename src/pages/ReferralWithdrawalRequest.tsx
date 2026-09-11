@@ -4,15 +4,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { withdrawalApi } from '../api/withdrawals';
 import { useCurrency } from '../hooks/useCurrency';
+import { balanceAmountFromDisplay } from '../utils/balanceScale';
 
 export default function ReferralWithdrawalRequest() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { formatWithCurrency, currencySymbol } = useCurrency();
+  const { formatAmount, formatWithCurrency, currencySymbol } = useCurrency();
 
+  // Withdrawals move wallet money: every amount here is Toman 1:1 (no ×100 / ÷100).
   const [form, setForm] = useState({
-    amount_rubles: 0,
+    amount_toman: 0,
     payment_details: '',
   });
 
@@ -40,9 +42,9 @@ export default function ReferralWithdrawalRequest() {
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     if (form.payment_details.length < 5) return;
-    if (form.amount_rubles <= 0) return;
+    if (form.amount_toman <= 0) return;
     withdrawMutation.mutate({
-      amount_kopeks: Math.round(form.amount_rubles * 100),
+      amount_kopeks: balanceAmountFromDisplay(form.amount_toman),
       payment_details: form.payment_details,
     });
   };
@@ -52,7 +54,7 @@ export default function ReferralWithdrawalRequest() {
       <h1 className="text-2xl font-bold text-dark-50">{t('referral.withdrawal.requestTitle')}</h1>
       <p className="text-sm text-dark-400">
         {t('referral.withdrawal.requestDesc', {
-          available: balance ? formatWithCurrency(balance.available_total / 100) : '',
+          available: balance ? formatWithCurrency(balance.available_total, 0) : '',
         })}
       </p>
 
@@ -65,14 +67,14 @@ export default function ReferralWithdrawalRequest() {
             <input
               id="rw-amount"
               type="number"
-              min={balance ? Math.ceil(balance.min_amount_kopeks / 100) : 0}
-              max={balance ? Math.floor(balance.available_total / 100) : 0}
+              min={balance ? balance.min_amount_kopeks : 0}
+              max={balance ? balance.available_total : 0}
               className="input w-full"
-              value={form.amount_rubles || ''}
+              value={form.amount_toman || ''}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  amount_rubles: e.target.value ? Number(e.target.value) : 0,
+                  amount_toman: e.target.value ? Number(e.target.value) : 0,
                 })
               }
               placeholder={t('referral.withdrawal.fields.amountPlaceholder', {
@@ -81,7 +83,7 @@ export default function ReferralWithdrawalRequest() {
             />
             <p className="mt-1 text-xs text-dark-500">
               {t('referral.withdrawal.fields.amountHint', {
-                min: balance ? Math.ceil(balance.min_amount_kopeks / 100) : 0,
+                min: balance ? formatAmount(balance.min_amount_kopeks, 0) : 0,
                 currency: currencySymbol,
               })}
             </p>
@@ -124,12 +126,12 @@ export default function ReferralWithdrawalRequest() {
             disabled={
               withdrawMutation.isPending ||
               form.payment_details.length < 5 ||
-              form.amount_rubles <= 0
+              form.amount_toman <= 0
             }
             className={`btn-primary flex-1 px-5 ${
               withdrawMutation.isPending ||
               form.payment_details.length < 5 ||
-              form.amount_rubles <= 0
+              form.amount_toman <= 0
                 ? 'opacity-50'
                 : ''
             }`}

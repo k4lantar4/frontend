@@ -1035,36 +1035,37 @@ export default function Referral() {
                 </h2>
               </div>
 
+              {/* Withdrawal stats are wallet amounts: Toman 1:1, no ÷100. */}
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 <div className="col-span-2 md:col-span-1">
                   <StatCard
                     label={t('referral.withdrawal.available')}
-                    value={formatWithCurrency(withdrawalBalance.available_total / 100)}
+                    value={formatWithCurrency(withdrawalBalance.available_total, 0)}
                     icon={<WalletIcon className="h-5 w-5" />}
                     tone="success"
                   />
                 </div>
                 <StatCard
                   label={t('referral.withdrawal.totalEarned')}
-                  value={formatWithCurrency(withdrawalBalance.total_earned / 100)}
+                  value={formatWithCurrency(withdrawalBalance.total_earned, 0)}
                   icon={<BanknotesIcon className="h-5 w-5" />}
                   tone="neutral"
                 />
                 <StatCard
                   label={t('referral.withdrawal.withdrawn')}
-                  value={formatWithCurrency(withdrawalBalance.withdrawn / 100)}
+                  value={formatWithCurrency(withdrawalBalance.withdrawn, 0)}
                   icon={<ArrowUpIcon className="h-5 w-5" />}
                   tone="neutral"
                 />
                 <StatCard
                   label={t('referral.withdrawal.spent')}
-                  value={formatWithCurrency(withdrawalBalance.referral_spent / 100)}
+                  value={formatWithCurrency(withdrawalBalance.referral_spent, 0)}
                   icon={<CardIcon className="h-5 w-5" />}
                   tone="neutral"
                 />
                 <StatCard
                   label={t('referral.withdrawal.pending')}
-                  value={formatWithCurrency(withdrawalBalance.pending / 100)}
+                  value={formatWithCurrency(withdrawalBalance.pending, 0)}
                   icon={<ArrowDownIcon className="h-5 w-5" />}
                   tone="warning"
                 />
@@ -1088,7 +1089,7 @@ export default function Referral() {
                   withdrawalBalance.min_amount_kopeks > 0 && (
                     <p className="mt-2 text-xs text-dark-500">
                       {t('referral.withdrawal.minAmount', {
-                        amount: formatWithCurrency(withdrawalBalance.min_amount_kopeks / 100),
+                        amount: formatWithCurrency(withdrawalBalance.min_amount_kopeks, 0),
                       })}
                     </p>
                   )
@@ -1112,7 +1113,8 @@ export default function Referral() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-dark-100">
-                          {formatWithCurrency(item.amount_rubles)}
+                          {/* amount_kopeks is Toman 1:1; the bot's amount_rubles is ÷100 (wrong). */}
+                          {formatWithCurrency(item.amount_kopeks, 0)}
                         </span>
                         <span className={getWithdrawalStatusBadge(item.status)}>
                           {t(`referral.withdrawal.status.${item.status}`, item.status)}

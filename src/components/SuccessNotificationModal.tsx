@@ -84,15 +84,14 @@ export default function SuccessNotificationModal() {
   const isDevicesPurchased = data.type === 'devices_purchased';
   const isTrafficPurchased = data.type === 'traffic_purchased';
 
-  // Format amount
-  const formattedAmount = data.amountKopeks
-    ? `${formatAmount(data.amountKopeks / 100)} ${currencySymbol}`
+  // Amounts arrive already on the display scale (see WebSocketNotifications).
+  const formattedAmount = data.amountToman
+    ? `${formatAmount(data.amountToman)} ${currencySymbol}`
     : null;
 
-  // Format new balance
   const formattedBalance =
-    data.newBalanceKopeks !== undefined
-      ? `${formatAmount(data.newBalanceKopeks / 100)} ${currencySymbol}`
+    data.newBalanceToman !== undefined
+      ? `${formatAmount(data.newBalanceToman)} ${currencySymbol}`
       : null;
 
   // Format expiry date

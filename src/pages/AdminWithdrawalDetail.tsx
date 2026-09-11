@@ -115,7 +115,8 @@ export default function AdminWithdrawalDetail() {
                 {t(badge.labelKey)}
               </span>
               <span className="font-semibold text-dark-100">
-                {formatWithCurrency(detail.amount_kopeks / 100, 0)}
+                {/* Withdrawal, balance and earnings amounts are Toman 1:1 — no ÷100. */}
+                {formatWithCurrency(detail.amount_kopeks, 0)}
               </span>
             </div>
           </div>
@@ -133,7 +134,7 @@ export default function AdminWithdrawalDetail() {
               {t('admin.withdrawals.detail.requestedAmount')}
             </div>
             <div className="text-lg font-bold text-accent-400">
-              {formatWithCurrency(detail.amount_kopeks / 100, 0)}
+              {formatWithCurrency(detail.amount_kopeks, 0)}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -158,7 +159,7 @@ export default function AdminWithdrawalDetail() {
                 {t('admin.withdrawals.detail.balance')}
               </div>
               <div className="text-sm font-medium text-dark-200">
-                {formatWithCurrency(detail.balance_kopeks / 100)}
+                {formatWithCurrency(detail.balance_kopeks, 0)}
               </div>
             </div>
             <div className="rounded-lg bg-dark-700/50 p-3">
@@ -172,7 +173,7 @@ export default function AdminWithdrawalDetail() {
                 {t('admin.withdrawals.detail.totalEarnings')}
               </div>
               <div className="text-sm font-medium text-dark-200">
-                {formatWithCurrency(detail.total_earnings_kopeks / 100)}
+                {formatWithCurrency(detail.total_earnings_kopeks, 0)}
               </div>
             </div>
             <div className="rounded-lg bg-dark-700/50 p-3">
@@ -347,7 +348,7 @@ export default function AdminWithdrawalDetail() {
               onClick={() =>
                 navigate(`/admin/withdrawals/${id}/reject`, {
                   state: {
-                    amountKopeks: detail.amount_kopeks,
+                    amountToman: detail.amount_kopeks,
                     username: detail.username,
                     firstName: detail.first_name,
                   },
