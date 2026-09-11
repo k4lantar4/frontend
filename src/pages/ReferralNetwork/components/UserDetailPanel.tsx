@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { referralNetworkApi } from '@/api/referralNetwork';
 import { CloseIcon } from '@/components/icons';
 import { useReferralNetworkStore } from '@/store/referralNetwork';
-import { formatKopeksToRubles, formatTomanAmount, getSubscriptionStatusColor } from '../utils';
-import { useCurrency } from '@/hooks/useCurrency';
+import { getSubscriptionStatusColor } from '../utils';
+import { tomanOrLegacy } from '@/utils/balanceScale';
+import { formatBalance } from '@/utils/format';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
 
 interface UserDetailPanelProps {
@@ -15,7 +16,6 @@ interface UserDetailPanelProps {
 
 export function UserDetailPanel({ userId, className }: UserDetailPanelProps) {
   const { t } = useTranslation();
-  const { currencySymbol } = useCurrency();
   const setSelectedNode = useReferralNetworkStore((s) => s.setSelectedNode);
 
   const {
@@ -142,7 +142,13 @@ export function UserDetailPanel({ userId, className }: UserDetailPanelProps) {
                     {t('admin.referralNetwork.user.totalSpent')}
                   </span>
                   <span className="font-mono text-dark-100">
-                    {formatKopeksToRubles(user.personal_spent_kopeks)} {currencySymbol}
+                    {formatBalance(
+                      tomanOrLegacy(
+                        user.personal_spent_toman,
+                        user.personal_spent_kopeks,
+                        'catalog',
+                      ),
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -150,7 +156,13 @@ export function UserDetailPanel({ userId, className }: UserDetailPanelProps) {
                     {t('admin.referralNetwork.user.referralEarnings')}
                   </span>
                   <span className="font-mono text-accent-400">
-                    {formatTomanAmount(user.personal_revenue_kopeks)} {currencySymbol}
+                    {formatBalance(
+                      tomanOrLegacy(
+                        user.personal_revenue_toman,
+                        user.personal_revenue_kopeks,
+                        'balance',
+                      ),
+                    )}
                   </span>
                 </div>
               </div>
@@ -179,7 +191,13 @@ export function UserDetailPanel({ userId, className }: UserDetailPanelProps) {
                     {t('admin.referralNetwork.user.branchRevenue')}
                   </span>
                   <span className="font-mono text-dark-100">
-                    {formatKopeksToRubles(user.branch_revenue_kopeks)} {currencySymbol}
+                    {formatBalance(
+                      tomanOrLegacy(
+                        user.branch_revenue_toman,
+                        user.branch_revenue_kopeks,
+                        'catalog',
+                      ),
+                    )}
                   </span>
                 </div>
               </div>

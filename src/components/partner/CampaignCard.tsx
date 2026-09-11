@@ -7,7 +7,9 @@ import type { PartnerCampaignInfo } from '../../api/partners';
 import { PARTNER_STATS } from '../../constants/partner';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useHaptic } from '../../platform';
+import { tomanOrLegacy } from '../../utils/balanceScale';
 import { copyToClipboard } from '../../utils/clipboard';
+import { formatBalance } from '../../utils/format';
 import { CampaignDetailStats } from './CampaignDetailStats';
 import { StatCard } from '../stats/StatCard';
 
@@ -21,7 +23,7 @@ interface CampaignCardProps {
 
 export function CampaignCard({ campaign }: CampaignCardProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency, formatPositive } = useCurrency();
+  const { formatWithCurrency } = useCurrency();
   const haptic = useHaptic();
   const [expanded, setExpanded] = useState(false);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
@@ -88,7 +90,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         />
         <StatCard
           label={t('referral.partner.stats.earnings')}
-          value={formatPositive(campaign.earnings_kopeks, 0)}
+          value={`+${formatBalance(tomanOrLegacy(campaign.earnings_toman, campaign.earnings_kopeks, 'balance'))}`}
           valueClassName="text-success-400"
         />
       </div>

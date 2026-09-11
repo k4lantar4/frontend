@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { CloseIcon } from '@/components/icons';
 import { referralNetworkApi } from '@/api/referralNetwork';
 import { useReferralNetworkStore } from '@/store/referralNetwork';
-import { formatKopeksToRubles } from '../utils';
-import { useCurrency } from '@/hooks/useCurrency';
+import { tomanOrLegacy } from '@/utils/balanceScale';
+import { formatBalance } from '@/utils/format';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
 
 interface CampaignDetailPanelProps {
@@ -14,7 +14,6 @@ interface CampaignDetailPanelProps {
 
 export function CampaignDetailPanel({ campaignId, className }: CampaignDetailPanelProps) {
   const { t } = useTranslation();
-  const { currencySymbol } = useCurrency();
   const setSelectedNode = useReferralNetworkStore((s) => s.setSelectedNode);
 
   const {
@@ -106,7 +105,13 @@ export function CampaignDetailPanel({ campaignId, className }: CampaignDetailPan
                     {t('admin.referralNetwork.campaign.totalRevenue')}
                   </span>
                   <span className="font-mono text-accent-400">
-                    {formatKopeksToRubles(campaign.total_revenue_kopeks)} {currencySymbol}
+                    {formatBalance(
+                      tomanOrLegacy(
+                        campaign.total_revenue_toman,
+                        campaign.total_revenue_kopeks,
+                        'catalog',
+                      ),
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -122,7 +127,9 @@ export function CampaignDetailPanel({ campaignId, className }: CampaignDetailPan
                     {t('admin.referralNetwork.campaign.avgCheck')}
                   </span>
                   <span className="font-mono text-dark-100">
-                    {formatKopeksToRubles(campaign.avg_check_kopeks)} {currencySymbol}
+                    {formatBalance(
+                      tomanOrLegacy(campaign.avg_check_toman, campaign.avg_check_kopeks, 'catalog'),
+                    )}
                   </span>
                 </div>
               </div>

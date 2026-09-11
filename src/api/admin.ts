@@ -289,6 +289,9 @@ export interface TopCampaignItem {
   conversion_rate: number;
   total_revenue_kopeks: number;
   avg_revenue_per_user_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_revenue_toman?: number;
+  avg_revenue_per_user_toman?: number;
   created_at?: string;
 }
 
@@ -297,6 +300,7 @@ export interface TopCampaignsResponse {
   total_campaigns: number;
   total_registrations: number;
   total_revenue_kopeks: number;
+  total_revenue_toman?: number;
 }
 
 export interface RecentPaymentItem {

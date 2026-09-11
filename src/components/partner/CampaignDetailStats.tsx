@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { partnerApi } from '../../api/partners';
 import { PARTNER_STATS } from '../../constants/partner';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 import { DailyChart } from '../stats/DailyChart';
 import { PeriodComparison } from '../stats/PeriodComparison';
 import { StatCard } from '../stats/StatCard';
@@ -16,7 +17,6 @@ interface CampaignDetailStatsProps {
 
 export function CampaignDetailStats({ campaignId }: CampaignDetailStatsProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['partner-campaign-stats', campaignId],
@@ -56,17 +56,23 @@ export function CampaignDetailStats({ campaignId }: CampaignDetailStatsProps) {
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <StatCard
           label={t('referral.partner.stats.today')}
-          value={formatWithCurrency(data.earnings_today, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.earnings_today_toman, data.earnings_today, 'balance'),
+          )}
           valueClassName="text-success-400"
         />
         <StatCard
           label={t('referral.partner.stats.week')}
-          value={formatWithCurrency(data.earnings_week, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.earnings_week_toman, data.earnings_week, 'balance'),
+          )}
           valueClassName="text-success-400"
         />
         <StatCard
           label={t('referral.partner.stats.month')}
-          value={formatWithCurrency(data.earnings_month, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.earnings_month_toman, data.earnings_month, 'balance'),
+          )}
           valueClassName="text-success-400"
         />
       </div>

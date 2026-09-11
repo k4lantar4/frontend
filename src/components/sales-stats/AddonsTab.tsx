@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import type { SalesStatsParams } from '../../api/adminSalesStats';
 import { salesStatsApi } from '../../api/adminSalesStats';
 import { SALES_STATS } from '../../constants/salesStats';
-import { useCurrency } from '../../hooks/useCurrency';
+import { tomanOrLegacy } from '../../utils/balanceScale';
+import { formatBalance } from '../../utils/format';
 import {
   BanknotesIcon,
   CardIcon,
@@ -25,7 +26,6 @@ interface AddonsTabProps {
 
 export function AddonsTab({ params }: AddonsTabProps) {
   const { t } = useTranslation();
-  const { formatWithCurrency } = useCurrency();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['sales-stats', 'addons', params],
@@ -77,7 +77,9 @@ export function AddonsTab({ params }: AddonsTabProps) {
         />
         <StatCard
           label={t('admin.salesStats.addons.revenue')}
-          value={formatWithCurrency(data.addon_revenue_kopeks / SALES_STATS.KOPEKS_DIVISOR, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.addon_revenue_toman, data.addon_revenue_kopeks, 'catalog'),
+          )}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="success"
         />
@@ -89,7 +91,9 @@ export function AddonsTab({ params }: AddonsTabProps) {
         />
         <StatCard
           label={t('admin.salesStats.addons.deviceRevenue')}
-          value={formatWithCurrency(data.device_revenue_kopeks / SALES_STATS.KOPEKS_DIVISOR, 0)}
+          value={formatBalance(
+            tomanOrLegacy(data.device_revenue_toman, data.device_revenue_kopeks, 'catalog'),
+          )}
           icon={<CardIcon className="h-5 w-5" />}
           tone="success"
         />

@@ -9,8 +9,8 @@ import {
   WalletIcon,
 } from '@/components/icons';
 import type { NetworkGraphData } from '@/types/referralNetwork';
-import { formatKopeksToRubles, formatTomanAmount } from '../utils';
-import { useCurrency } from '@/hooks/useCurrency';
+import { tomanOrLegacy } from '@/utils/balanceScale';
+import { formatBalance } from '@/utils/format';
 
 interface NetworkStatsProps {
   data: NetworkGraphData;
@@ -19,7 +19,6 @@ interface NetworkStatsProps {
 
 export function NetworkStats({ data, className }: NetworkStatsProps) {
   const { t } = useTranslation();
-  const { currencySymbol } = useCurrency();
 
   return (
     <div
@@ -46,14 +45,22 @@ export function NetworkStats({ data, className }: NetworkStatsProps) {
         />
         <StatCard
           label={t('admin.referralNetwork.stats.subscriptionRevenue')}
-          value={`${formatKopeksToRubles(data.total_subscription_revenue_kopeks)} ${currencySymbol}`}
+          value={formatBalance(
+            tomanOrLegacy(
+              data.total_subscription_revenue_toman,
+              data.total_subscription_revenue_kopeks,
+              'catalog',
+            ),
+          )}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="accent"
         />
         <div className="col-span-2">
           <StatCard
             label={t('admin.referralNetwork.stats.totalEarnings')}
-            value={`${formatTomanAmount(data.total_earnings_kopeks)} ${currencySymbol}`}
+            value={formatBalance(
+              tomanOrLegacy(data.total_earnings_toman, data.total_earnings_kopeks, 'balance'),
+            )}
             icon={<WalletIcon className="h-5 w-5" />}
             tone="neutral"
           />
