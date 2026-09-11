@@ -16,9 +16,23 @@ export function wsAmountToman(
   raw: number | null | undefined,
   scale: AmountScale,
 ): number {
-  if (display != null && Number.isFinite(display)) return display;
-  if (raw == null || !Number.isFinite(raw)) return 0;
-  return scale === 'balance' ? raw : catalogPriceInToman(raw);
+  return tomanOrLegacy(display, raw, scale);
+}
+
+/**
+ * Display Toman for an amount the bot sends twice: a `*_toman` field already in display
+ * Toman (remnabot#40 stats aggregates, render with `formatBalance`, never ÷100) and the
+ * legacy field. The legacy field is read on `legacyScale` only when `*_toman` is absent,
+ * i.e. against a bot older than the field.
+ */
+export function tomanOrLegacy(
+  toman: number | null | undefined,
+  legacy: number | null | undefined,
+  legacyScale: AmountScale,
+): number {
+  if (toman != null && Number.isFinite(toman)) return toman;
+  if (legacy == null || !Number.isFinite(legacy)) return 0;
+  return legacyScale === 'balance' ? legacy : catalogPriceInToman(legacy);
 }
 
 /** A typed Toman wallet amount (e.g. a withdrawal request) goes out 1:1 — never ×100. */
