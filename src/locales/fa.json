@@ -23,7 +23,7 @@
     "copy": "کپی",
     "units": {
       "tb": "TB",
-      "gb": "GB",
+      "gb": "گیگ",
       "mb": "MB"
     },
     "add": "افزودن",
@@ -395,7 +395,7 @@
     "perDevice": "/ کاربر",
     "summary": {
       "period": "دوره: {{label}}",
-      "traffic": "ترافیک: {{gb}} GB"
+      "traffic": "ترافیک: {{gb}} گیگ"
     },
     "total": "جمع کل",
     "purchase": "خرید",
