@@ -455,9 +455,8 @@ export default function AdminReferralLevels() {
                 />
                 <NumberField
                   label={t('admin.referralLevels.fixedAmount')}
-                  value={level.referrer_fixed_kopeks ? level.referrer_fixed_kopeks / 100 : ''}
+                  value={level.referrer_fixed_kopeks || ''}
                   disabled={level.reward_mode === 'days'}
-                  scale={100}
                   onCommit={(parsed) => save(level.level, { referrer_fixed_kopeks: parsed })}
                   onInvalid={(name) =>
                     setSaveError(t('admin.referralLevels.invalidValue', { field: name }))
@@ -500,9 +499,8 @@ export default function AdminReferralLevels() {
                 </div>
                 <NumberField
                   label={t('admin.referralLevels.fixedAmount')}
-                  value={level.referee_fixed_kopeks ? level.referee_fixed_kopeks / 100 : ''}
+                  value={level.referee_fixed_kopeks || ''}
                   disabled={level.reward_mode === 'days'}
-                  scale={100}
                   onCommit={(parsed) => save(level.level, { referee_fixed_kopeks: parsed })}
                   onInvalid={(name) =>
                     setSaveError(t('admin.referralLevels.invalidValue', { field: name }))
