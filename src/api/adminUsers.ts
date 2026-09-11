@@ -73,6 +73,8 @@ export interface UserListItem {
   promo_group_id: number | null;
   promo_group_name: string | null;
   total_spent_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_spent_toman?: number;
   purchase_count: number;
   has_restrictions: boolean;
   restriction_topup: boolean;
@@ -129,6 +131,8 @@ export interface UserDetailResponse {
   promo_group: UserPromoGroupInfo | null;
   referral: UserReferralInfo;
   total_spent_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_spent_toman?: number;
   purchase_count: number;
   used_promocodes: number;
   has_had_paid_subscription: boolean;

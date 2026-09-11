@@ -14,6 +14,10 @@ export interface NetworkUserNode {
   branch_revenue_kopeks: number;
   personal_revenue_kopeks: number;
   personal_spent_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  branch_revenue_toman?: number;
+  personal_revenue_toman?: number;
+  personal_spent_toman?: number;
   subscription_name: string | null;
   subscription_end: string | null;
   subscription_status: SubscriptionStatus | null;
@@ -30,6 +34,9 @@ export interface NetworkCampaignNode {
   total_revenue_kopeks: number;
   conversion_rate: number;
   avg_check_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_revenue_toman?: number;
+  avg_check_toman?: number;
   top_referrers: Array<{
     user_id: number;
     username: string | null;
@@ -52,6 +59,9 @@ export interface NetworkGraphData {
   total_campaigns: number;
   total_earnings_kopeks: number;
   total_subscription_revenue_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_earnings_toman?: number;
+  total_subscription_revenue_toman?: number;
 }
 
 export interface NetworkUserDetail {
@@ -70,6 +80,10 @@ export interface NetworkUserDetail {
   branch_revenue_kopeks: number;
   personal_revenue_kopeks: number;
   personal_spent_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  branch_revenue_toman?: number;
+  personal_revenue_toman?: number;
+  personal_spent_toman?: number;
   subscription_name: string | null;
   subscription_end: string | null;
   subscription_status: SubscriptionStatus | null;
@@ -86,6 +100,9 @@ export interface NetworkCampaignDetail {
   total_revenue_kopeks: number;
   conversion_rate: number;
   avg_check_kopeks: number;
+  /** Display Toman (remnabot#40). */
+  total_revenue_toman?: number;
+  avg_check_toman?: number;
   top_referrers: Array<{
     user_id: number;
     username: string | null;

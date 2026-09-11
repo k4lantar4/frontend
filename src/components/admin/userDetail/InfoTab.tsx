@@ -5,6 +5,8 @@ import { backTo } from '../AdminBackButton';
 import { useNotify } from '../../../platform/hooks/useNotify';
 import { useCurrency } from '../../../hooks/useCurrency';
 import { createNumberInputHandler } from '../../../utils/inputHelpers';
+import { tomanOrLegacy } from '../../../utils/balanceScale';
+import { formatBalance } from '../../../utils/format';
 import {
   adminUsersApi,
   type UserDetailResponse,
@@ -215,7 +217,11 @@ export function InfoTab(props: InfoTabProps) {
         </div>
         <div className="rounded-xl bg-dark-800/50 p-3">
           <div className="mb-1 text-xs text-dark-500">{t('admin.users.detail.totalSpent')}</div>
-          <div className="text-dark-100">{formatWithCurrency(user.total_spent_kopeks / 100)}</div>
+          <div className="text-dark-100">
+            {formatBalance(
+              tomanOrLegacy(user.total_spent_toman, user.total_spent_kopeks, 'catalog'),
+            )}
+          </div>
         </div>
         <div className="rounded-xl bg-dark-800/50 p-3">
           <div className="mb-1 text-xs text-dark-500">{t('admin.users.detail.purchases')}</div>
@@ -470,7 +476,9 @@ export function InfoTab(props: InfoTabProps) {
                     </div>
                   </div>
                   <div className="shrink-0 text-xs text-dark-400">
-                    {formatWithCurrency(ref.total_spent_kopeks / 100)}
+                    {formatBalance(
+                      tomanOrLegacy(ref.total_spent_toman, ref.total_spent_kopeks, 'catalog'),
+                    )}
                   </div>
                 </button>
               ))}
