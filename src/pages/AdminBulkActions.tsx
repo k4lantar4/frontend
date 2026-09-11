@@ -24,6 +24,8 @@ import { PiCaretDown } from 'react-icons/pi';
 import { usePlatform } from '../platform/hooks/usePlatform';
 import { useCurrency } from '../hooks/useCurrency';
 import { cn } from '@/lib/utils';
+import { tomanOrLegacy } from '../utils/balanceScale';
+import { formatBalance } from '../utils/format';
 import {
   BackIcon,
   CheckIcon,
@@ -764,12 +766,16 @@ export default function AdminBulkActions() {
         accessorKey: 'total_spent_kopeks',
         header: t('admin.bulkActions.columns.spent'),
         size: 100,
-        cell: ({ getValue }) => {
-          const kopeks = getValue() as number;
+        cell: ({ row }) => {
+          // The bot sums spend across mixed-scale transactions into total_spent_toman
+          // (remnabot#40); ÷100 on total_spent_kopeks shrank balance-scale rows.
+          const toman = tomanOrLegacy(
+            row.original.total_spent_toman,
+            row.original.total_spent_kopeks,
+            'catalog',
+          );
           return (
-            <span className="text-xs text-dark-300">
-              {kopeks > 0 ? formatWithCurrency(kopeks / 100) : '-'}
-            </span>
+            <span className="text-xs text-dark-300">{toman > 0 ? formatBalance(toman) : '-'}</span>
           );
         },
       },
