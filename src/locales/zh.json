@@ -521,7 +521,14 @@
       "remainingDays": "剩余天数",
       "switch": "切换",
       "title": "切换套餐",
-      "upgradeCost": "升级费用"
+      "upgradeCost": "升级费用",
+      "entryHint": "将此订阅切换到其他套餐，无需购买新订阅",
+      "errors": {
+        "alreadyOwned": "您已拥有该套餐的有效订阅。如需更多时间，请续费该订阅。",
+        "downgradeDisabled": "目前无法切换到更便宜或同价的套餐。",
+        "upgradeDisabled": "目前无法切换到更贵的套餐。",
+        "notAvailable": "该套餐对您的账户不可用。"
+      }
     },
     "promoGroup": {
       "yourGroup": "您的组：{{name}}",

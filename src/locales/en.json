@@ -581,7 +581,14 @@
       "switched": "Tariff switched",
       "notEnoughBalance": "Insufficient balance",
       "dailyPayment": "Daily payment",
-      "dailyChargeDescription": "Charged daily from your balance"
+      "dailyChargeDescription": "Charged daily from your balance",
+      "entryHint": "Move this subscription to another tariff instead of buying a new one",
+      "errors": {
+        "alreadyOwned": "You already have an active subscription on this tariff. Renew that one if you need more time.",
+        "downgradeDisabled": "Switching to a cheaper or same-priced tariff isn't available right now.",
+        "upgradeDisabled": "Switching to a more expensive tariff isn't available right now.",
+        "notAvailable": "This tariff isn't available for your account."
+      }
     },
     "switchTraffic": {
       "title": "Change Traffic",
