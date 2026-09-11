@@ -15,12 +15,27 @@ import { uiLocale } from './uiLocale';
 
 const LANG_CURRENCY_MAP: Record<
   string,
-  { currency: string; locale: string; symbol: string; key?: keyof ExchangeRates }
+  {
+    currency: string;
+    locale: string;
+    symbol: string;
+    key?: keyof ExchangeRates;
+    /** Locale key for a unit written after the number instead of an Intl currency code. */
+    unitKey?: string;
+  }
 > = {
   ru: { currency: 'RUB', locale: 'ru-RU', symbol: '₽' },
   en: { currency: 'USD', locale: 'en-US', symbol: '$', key: 'USD' },
   zh: { currency: 'CNY', locale: 'zh-CN', symbol: '¥', key: 'CNY' },
-  fa: { currency: 'IRR', locale: 'fa-IR-u-nu-latn', symbol: '﷼', key: 'IRR' },
+  // Amounts are Toman. Intl's IRR code would print «ریال», so the unit comes from
+  // common.currency («تومان»), matching the bot's format_price / format_balance.
+  fa: {
+    currency: 'IRR',
+    locale: 'fa-IR-u-nu-latn',
+    symbol: 'تومان',
+    key: 'IRR',
+    unitKey: 'common.currency',
+  },
 };
 
 const DEFAULT_CURRENCY = { currency: 'RUB', locale: 'ru-RU', symbol: '₽' };
@@ -66,7 +81,10 @@ export function formatBalance(toman: number, lang?: string): string {
 
 function formatDisplayAmount(displayAmount: number, lang?: string): string {
   const resolvedLang = lang || i18next.language || 'ru';
-  const config = LANG_CURRENCY_MAP[resolvedLang] || DEFAULT_CURRENCY;
+  const config =
+    LANG_CURRENCY_MAP[resolvedLang] ||
+    LANG_CURRENCY_MAP[languageBase(resolvedLang)] ||
+    DEFAULT_CURRENCY;
   let amount = displayAmount;
 
   // Конвертация по курсу для не-рублёвых локалей. Без rates fallback на сырую сумму
@@ -79,6 +97,13 @@ function formatDisplayAmount(displayAmount: number, lang?: string): string {
   // Для IRR суммы большие — без дробной части.
   const maximumFractionDigits = config.currency === 'IRR' ? 0 : 2;
 
+  if ('unitKey' in config && config.unitKey) {
+    const rounded = Math.round(amount);
+    const sign = rounded < 0 ? '-' : '';
+    const grouped = Math.abs(rounded).toLocaleString(config.locale);
+    return `${sign}${grouped} ${unitLabel(config.unitKey, resolvedLang, config.symbol)}`;
+  }
+
   try {
     return new Intl.NumberFormat(config.locale, {
       style: 'currency',
@@ -90,6 +115,13 @@ function formatDisplayAmount(displayAmount: number, lang?: string): string {
       maximumFractionDigits === 0 ? Math.round(amount) : Math.round(amount * 100) / 100;
     return `${rounded} ${config.symbol}`;
   }
+}
+
+function unitLabel(key: string, lang: string, fallback: string): string {
+  const translate = (i18next as { t?: (k: string, o: Record<string, unknown>) => string }).t;
+  if (typeof translate !== 'function') return fallback;
+  const label = translate.call(i18next, key, { lng: languageBase(lang), defaultValue: fallback });
+  return label && label !== key ? label : fallback;
 }
 
 /** Date-only (dd.mm.yyyy) in the active UI locale; '-' for a null date. */

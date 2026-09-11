@@ -48,3 +48,28 @@ describe('formatBalance (Toman 1:1 wallet amounts)', () => {
     expect(formatBalance(1_000_000, 'fa')).toBe(formatPrice(100_000_000, 'fa'));
   });
 });
+
+describe('fa amounts read «تومان» like the bot (never «ریال»)', () => {
+  beforeEach(() => {
+    setExchangeRates({ USD: 100, CNY: 14, IRR: 0.00628 });
+  });
+
+  it('formats a 10,000 Toman catalog price as "10,000 تومان"', () => {
+    expect(formatPrice(1_000_000, 'fa')).toBe('10,000 تومان');
+  });
+
+  it('formats a 50,000 Toman balance as "50,000 تومان"', () => {
+    expect(formatBalance(50_000, 'fa')).toBe('50,000 تومان');
+    expect(formatBalance(1_000_000, 'fa')).toBe('1,000,000 تومان');
+  });
+
+  it('treats a regional fa-IR tag as fa', () => {
+    expect(formatBalance(50_000, 'fa-IR')).toBe('50,000 تومان');
+  });
+
+  it('keeps the sign and never shows ریال or ﷼', () => {
+    const rendered = formatBalance(-20_000, 'fa');
+    expect(rendered).toBe('-20,000 تومان');
+    expect(rendered).not.toMatch(/ریال|﷼/);
+  });
+});

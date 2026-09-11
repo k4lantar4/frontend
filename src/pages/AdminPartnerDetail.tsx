@@ -165,25 +165,25 @@ export default function AdminPartnerDetail() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard
               label={t('admin.partnerDetail.earnings.allTime')}
-              value={formatWithCurrency(partner.earnings_all_time / 100)}
+              value={formatWithCurrency(partner.earnings_all_time, 0)}
               icon={<BanknotesIcon className="h-5 w-5" />}
               tone="success"
             />
             <StatCard
               label={t('admin.partnerDetail.earnings.today')}
-              value={formatWithCurrency(partner.earnings_today / 100)}
+              value={formatWithCurrency(partner.earnings_today, 0)}
               icon={<CalendarIcon className="h-5 w-5" />}
               tone="neutral"
             />
             <StatCard
               label={t('admin.partnerDetail.earnings.week')}
-              value={formatWithCurrency(partner.earnings_week / 100)}
+              value={formatWithCurrency(partner.earnings_week, 0)}
               icon={<CalendarBlankIcon className="h-5 w-5" />}
               tone="neutral"
             />
             <StatCard
               label={t('admin.partnerDetail.earnings.month')}
-              value={formatWithCurrency(partner.earnings_month / 100)}
+              value={formatWithCurrency(partner.earnings_month, 0)}
               icon={<CalendarStarIcon className="h-5 w-5" />}
               tone="neutral"
             />
@@ -298,7 +298,8 @@ export default function AdminPartnerDetail() {
                       <div
                         className={`text-sm font-medium ${campaign.earnings_kopeks > 0 ? 'text-success-400' : 'text-dark-400'}`}
                       >
-                        {formatWithCurrency(campaign.earnings_kopeks / 100)}
+                        {/* Referral earnings (ReferralEarning sums) are Toman 1:1 — no ÷100. */}
+                        {formatWithCurrency(campaign.earnings_kopeks, 0)}
                       </div>
                       <div className="text-[10px] text-dark-500">
                         {t('admin.partnerDetail.campaigns.earnings', 'Доход')}

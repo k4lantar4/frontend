@@ -396,7 +396,8 @@ export function InfoTab(props: InfoTabProps) {
           </div>
           <div>
             <div className="text-lg font-bold text-dark-100">
-              {formatWithCurrency(user.referral.total_earnings_kopeks / 100)}
+              {/* Referral earnings (ReferralEarning sums) are Toman 1:1 — no ÷100. */}
+              {formatWithCurrency(user.referral.total_earnings_kopeks, 0)}
             </div>
             <div className="text-xs text-dark-500">{t('admin.users.detail.referral.earned')}</div>
           </div>

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { referralNetworkApi } from '@/api/referralNetwork';
 import { CloseIcon } from '@/components/icons';
 import { useReferralNetworkStore } from '@/store/referralNetwork';
-import { formatKopeksToRubles, getSubscriptionStatusColor } from '../utils';
+import { formatKopeksToRubles, formatTomanAmount, getSubscriptionStatusColor } from '../utils';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
 
@@ -150,7 +150,7 @@ export function UserDetailPanel({ userId, className }: UserDetailPanelProps) {
                     {t('admin.referralNetwork.user.referralEarnings')}
                   </span>
                   <span className="font-mono text-accent-400">
-                    {formatKopeksToRubles(user.personal_revenue_kopeks)} {currencySymbol}
+                    {formatTomanAmount(user.personal_revenue_kopeks)} {currencySymbol}
                   </span>
                 </div>
               </div>

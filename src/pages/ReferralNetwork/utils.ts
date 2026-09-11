@@ -2,10 +2,17 @@ import { uiLocale } from '@/utils/uiLocale';
 import type { SubscriptionStatus } from '@/types/referralNetwork';
 
 /**
- * Format kopeks to a human-readable ruble string.
+ * Format a catalog-scale amount (×100, e.g. subscription spend) for display.
  */
 export function formatKopeksToRubles(kopeks: number): string {
   return `${(kopeks / 100).toLocaleString(uiLocale())}`;
+}
+
+/**
+ * Format a wallet-scale amount (Toman 1:1, e.g. a ReferralEarning sum) for display.
+ */
+export function formatTomanAmount(toman: number): string {
+  return Math.round(Number.isFinite(toman) ? toman : 0).toLocaleString(uiLocale());
 }
 
 /**

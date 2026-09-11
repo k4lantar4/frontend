@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
 import type { CampaignReferralItem } from '../../api/partners';
-import { PARTNER_STATS } from '../../constants/partner';
 import { useCurrency } from '../../hooks/useCurrency';
 
 interface TopReferralsProps {
@@ -60,7 +59,8 @@ export function TopReferrals({ referrals }: TopReferralsProps) {
               </div>
             </div>
             <div className="text-sm font-semibold text-success-400">
-              {formatWithCurrency(ref.total_earnings_kopeks / PARTNER_STATS.KOPEKS_DIVISOR)}
+              {/* Referral earnings (ReferralEarning sums) are Toman 1:1 — no ÷100. */}
+              {formatWithCurrency(ref.total_earnings_kopeks, 0)}
             </div>
           </div>
         ))}

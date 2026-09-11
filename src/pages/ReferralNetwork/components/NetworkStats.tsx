@@ -9,7 +9,7 @@ import {
   WalletIcon,
 } from '@/components/icons';
 import type { NetworkGraphData } from '@/types/referralNetwork';
-import { formatKopeksToRubles } from '../utils';
+import { formatKopeksToRubles, formatTomanAmount } from '../utils';
 import { useCurrency } from '@/hooks/useCurrency';
 
 interface NetworkStatsProps {
@@ -53,7 +53,7 @@ export function NetworkStats({ data, className }: NetworkStatsProps) {
         <div className="col-span-2">
           <StatCard
             label={t('admin.referralNetwork.stats.totalEarnings')}
-            value={`${formatKopeksToRubles(data.total_earnings_kopeks)} ${currencySymbol}`}
+            value={`${formatTomanAmount(data.total_earnings_kopeks)} ${currencySymbol}`}
             icon={<WalletIcon className="h-5 w-5" />}
             tone="neutral"
           />

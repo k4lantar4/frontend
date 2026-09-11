@@ -56,17 +56,17 @@ export function CampaignDetailStats({ campaignId }: CampaignDetailStatsProps) {
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <StatCard
           label={t('referral.partner.stats.today')}
-          value={formatWithCurrency(data.earnings_today / PARTNER_STATS.KOPEKS_DIVISOR)}
+          value={formatWithCurrency(data.earnings_today, 0)}
           valueClassName="text-success-400"
         />
         <StatCard
           label={t('referral.partner.stats.week')}
-          value={formatWithCurrency(data.earnings_week / PARTNER_STATS.KOPEKS_DIVISOR)}
+          value={formatWithCurrency(data.earnings_week, 0)}
           valueClassName="text-success-400"
         />
         <StatCard
           label={t('referral.partner.stats.month')}
-          value={formatWithCurrency(data.earnings_month / PARTNER_STATS.KOPEKS_DIVISOR)}
+          value={formatWithCurrency(data.earnings_month, 0)}
           valueClassName="text-success-400"
         />
       </div>
