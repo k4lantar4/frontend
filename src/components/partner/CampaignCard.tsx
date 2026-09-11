@@ -88,7 +88,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         />
         <StatCard
           label={t('referral.partner.stats.earnings')}
-          value={formatPositive(campaign.earnings_kopeks / PARTNER_STATS.KOPEKS_DIVISOR)}
+          value={formatPositive(campaign.earnings_kopeks, 0)}
           valueClassName="text-success-400"
         />
       </div>

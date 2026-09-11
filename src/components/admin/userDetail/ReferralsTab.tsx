@@ -338,7 +338,7 @@ export function ReferralsTab({ user, userId, onUserRefresh }: ReferralsTabProps)
         />
         <StatCard
           label={t('admin.users.detail.referrals.totalEarnings')}
-          value={formatWithCurrency(user.referral.total_earnings_kopeks / 100)}
+          value={formatWithCurrency(user.referral.total_earnings_kopeks, 0)}
           icon={<BanknotesIcon className="h-5 w-5" />}
           tone="neutral"
         />

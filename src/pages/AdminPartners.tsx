@@ -87,7 +87,7 @@ export default function AdminPartners() {
           />
           <StatCard
             label={t('admin.partners.totalEarnings')}
-            value={formatWithCurrency(stats.total_earnings_kopeks / 100)}
+            value={formatWithCurrency(stats.total_earnings_kopeks, 0)}
             icon={<BanknotesIcon className="h-5 w-5" />}
             tone="success"
           />
@@ -164,7 +164,8 @@ export default function AdminPartners() {
                           {t('admin.partners.referrals', { count: partner.total_referrals })}
                         </span>
                         <span className="text-success-400">
-                          {formatWithCurrency(partner.total_earnings_kopeks / 100)}
+                          {/* Referral earnings (ReferralEarning sums) are Toman 1:1 — no ÷100. */}
+                          {formatWithCurrency(partner.total_earnings_kopeks, 0)}
                         </span>
                       </div>
                     </div>

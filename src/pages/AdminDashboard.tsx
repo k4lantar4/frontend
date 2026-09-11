@@ -677,7 +677,7 @@ export default function AdminDashboard() {
                       {referrersTab === 'earnings' ? (
                         <>
                           <div className="text-xs font-semibold text-success-400 sm:text-sm">
-                            {formatAmount(ref.earnings_total_kopeks / 100)} {currencySymbol}
+                            {formatAmount(ref.earnings_total_kopeks)} {currencySymbol}
                           </div>
                           <div className="text-[10px] text-dark-500 sm:text-xs">
                             {ref.invited_count} {t('adminDashboard.topReferrers.invites')}
@@ -689,7 +689,7 @@ export default function AdminDashboard() {
                             {ref.invited_count} {t('adminDashboard.topReferrers.people')}
                           </div>
                           <div className="text-[10px] text-dark-500 sm:text-xs">
-                            {formatAmount(ref.earnings_total_kopeks / 100)} {currencySymbol}
+                            {formatAmount(ref.earnings_total_kopeks)} {currencySymbol}
                           </div>
                         </>
                       )}
@@ -706,7 +706,7 @@ export default function AdminDashboard() {
                   (referrersTab === 'earnings'
                     ? referrers.by_earnings
                     : referrers.by_invited
-                  ).reduce((sum, r) => sum + r.earnings_today_kopeks, 0) / 100,
+                  ).reduce((sum, r) => sum + r.earnings_today_kopeks, 0),
                 )} ${currencySymbol}`}
                 icon={<ClockIcon className="h-5 w-5" />}
                 tone="neutral"
@@ -717,7 +717,7 @@ export default function AdminDashboard() {
                   (referrersTab === 'earnings'
                     ? referrers.by_earnings
                     : referrers.by_invited
-                  ).reduce((sum, r) => sum + r.earnings_week_kopeks, 0) / 100,
+                  ).reduce((sum, r) => sum + r.earnings_week_kopeks, 0),
                 )} ${currencySymbol}`}
                 icon={<CalendarBlankIcon className="h-5 w-5" />}
                 tone="neutral"
@@ -728,7 +728,7 @@ export default function AdminDashboard() {
                   (referrersTab === 'earnings'
                     ? referrers.by_earnings
                     : referrers.by_invited
-                  ).reduce((sum, r) => sum + r.earnings_month_kopeks, 0) / 100,
+                  ).reduce((sum, r) => sum + r.earnings_month_kopeks, 0),
                 )} ${currencySymbol}`}
                 icon={<CalendarIcon className="h-5 w-5" />}
                 tone="neutral"
