@@ -112,19 +112,28 @@ export function SwitchTariffSheet({
       navigate('/subscriptions', { replace: true });
     },
     onError: (error: unknown) => {
-      // Backend signal: this subscription can't be switched (it lapsed, or it's
-      // a trial). Hand the selected tariff back to the parent so it opens the
-      // regular purchase form instead.
-      if (shouldUsePurchaseFlow(error)) {
-        const targetTariff = tariffs.find((tariff) => tariff.id === tariffId);
-        if (targetTariff) {
-          onClose();
-          onExpiredFallback(targetTariff);
-          queryClient.invalidateQueries({ queryKey: ['purchase-options', subscriptionId] });
-        }
-      }
+      if (shouldUsePurchaseFlow(error)) handOffToPurchase();
     },
   });
+
+  // Backend signal: this subscription can't be switched (it lapsed, or it's
+  // a trial). Hand the selected tariff back to the parent so it opens the
+  // regular purchase form instead.
+  function handOffToPurchase() {
+    const targetTariff = tariffs.find((tariff) => tariff.id === tariffId);
+    if (targetTariff) {
+      onClose();
+      onExpiredFallback(targetTariff);
+      queryClient.invalidateQueries({ queryKey: ['purchase-options', subscriptionId] });
+    }
+  }
+
+  // The same signal can already arrive on the preview (the subscription lapsed
+  // while the grid was open) — don't show the bot's English message there.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: react to a new preview error only
+  useEffect(() => {
+    if (shouldUsePurchaseFlow(switchPreviewError)) handOffToPurchase();
+  }, [switchPreviewError]);
 
   // Smoothly scroll the panel into view when opened.
   useEffect(() => {

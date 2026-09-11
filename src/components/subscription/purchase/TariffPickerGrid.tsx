@@ -6,7 +6,11 @@ import { useCurrency } from '../../../hooks/useCurrency';
 import { usePromoDiscount } from '../../../hooks/usePromoDiscount';
 import { dailyPriceQuote } from './dailyPrice';
 import { getGlassColors } from '../../../utils/glassTheme';
-import { canSwitchTariff } from '../../../utils/tariffSwitch';
+import {
+  canSwitchTariff,
+  isSwitchBlockedByDirection,
+  type TariffSwitchContext,
+} from '../../../utils/tariffSwitch';
 import { ArrowDownIcon, DevicesIcon, RestartIcon } from '@/components/icons';
 import type { Tariff, Subscription, PurchaseOptions } from '../../../types';
 
@@ -65,6 +69,32 @@ export function TariffPickerGrid({
       ? t('subscription.free', 'Бесплатно')
       : `${formatAmount(kopeks / 100)} ${currencySymbol}`;
   const isNewPurchase = purchaseIntent === 'new';
+  const isSubscriptionExpired =
+    !isNewPurchase &&
+    isTariffsMode &&
+    !!purchaseOptions &&
+    'subscription_is_expired' in purchaseOptions &&
+    purchaseOptions.subscription_is_expired === true;
+  // Free (0₽) source tariff: the backend blocks the prorated switch
+  // (free_tariff_cannot_switch) — offer the purchase flow instead.
+  const isOnFreeTariff =
+    isTariffsMode &&
+    !!purchaseOptions &&
+    'subscription_on_free_tariff' in purchaseOptions &&
+    purchaseOptions.subscription_on_free_tariff === true;
+  const isCurrentTariffCard = (tariff: Tariff) =>
+    !isNewPurchase && (!!tariff.is_current || tariff.id === subscription?.tariff_id);
+  const switchContext = (tariff: Tariff): TariffSwitchContext => ({
+    isNewPurchase,
+    isMultiTariff,
+    boundSubscriptionId: subscriptionId,
+    subscription,
+    isCurrentTariff: isCurrentTariffCard(tariff),
+    isSubscriptionExpired,
+    isOnFreeTariff,
+    targetOwned: !!tariff.is_purchased,
+    switchAllowed: tariff.switch_allowed !== false,
+  });
 
   return (
     <>
@@ -135,6 +165,9 @@ export function TariffPickerGrid({
             if (subscription?.is_trial && tariff.name.toLowerCase().includes('trial')) {
               return false;
             }
+            // The bot refuses this direction (e.g. equal price with downgrades off) and
+            // hides such tariffs from its own switch list — do the same.
+            if (isSwitchBlockedByDirection(switchContext(tariff))) return false;
             return true;
           })
           .sort((a, b) => {
@@ -145,31 +178,8 @@ export function TariffPickerGrid({
             return 0;
           })
           .map((tariff) => {
-            const isCurrentTariff =
-              !isNewPurchase && (tariff.is_current || tariff.id === subscription?.tariff_id);
-            const isSubscriptionExpired =
-              !isNewPurchase &&
-              isTariffsMode &&
-              purchaseOptions &&
-              'subscription_is_expired' in purchaseOptions &&
-              purchaseOptions.subscription_is_expired === true;
-            // Free (0₽) source tariff: the backend blocks the prorated switch
-            // (free_tariff_cannot_switch) — offer the purchase flow instead.
-            const isOnFreeTariff =
-              isTariffsMode &&
-              purchaseOptions &&
-              'subscription_on_free_tariff' in purchaseOptions &&
-              purchaseOptions.subscription_on_free_tariff === true;
-            const canSwitch = canSwitchTariff({
-              isNewPurchase,
-              isMultiTariff,
-              boundSubscriptionId: subscriptionId,
-              subscription,
-              isCurrentTariff,
-              isSubscriptionExpired: !!isSubscriptionExpired,
-              isOnFreeTariff: !!isOnFreeTariff,
-              targetOwned: !!tariff.is_purchased,
-            });
+            const isCurrentTariff = isCurrentTariffCard(tariff);
+            const canSwitch = canSwitchTariff(switchContext(tariff));
             const isLegacySubscription =
               !isNewPurchase && subscription && !subscription.is_trial && !subscription.tariff_id;
 
