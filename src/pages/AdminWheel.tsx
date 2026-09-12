@@ -50,6 +50,7 @@ import { BreakdownList } from '@/components/sales-stats/BreakdownList';
 import { useCurrency } from '@/hooks/useCurrency';
 import { usePlatform } from '../platform/hooks/usePlatform';
 import { toNumber } from '../utils/inputHelpers';
+import { wheelPrizeValueUnit } from '../utils/wheelPrizeUnit';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
 
 const PRIZE_TYPE_KEYS = [
@@ -1060,13 +1061,14 @@ function InlinePrizeForm({
         {formData.prize_type !== 'nothing' && (
           <div>
             <label className="mb-2 block text-sm font-medium text-dark-300">
-              {t('admin.wheel.prizes.fields.value')} (
-              {formData.prize_type === 'balance_bonus'
-                ? currencySymbol
-                : formData.prize_type === 'subscription_days'
-                  ? t('admin.wheel.prizes.fields.unitDays')
-                  : t('admin.wheel.prizes.fields.unitGb')}
-              )
+              {t('admin.wheel.prizes.fields.value')}
+              {(() => {
+                const unit = wheelPrizeValueUnit(formData.prize_type);
+                if (unit === 'currency') return ` (${currencySymbol})`;
+                if (unit === 'days') return ` (${t('admin.wheel.prizes.fields.unitDays')})`;
+                if (unit === 'gb') return ` (${t('admin.wheel.prizes.fields.unitGb')})`;
+                return null;
+              })()}
             </label>
             <input
               type="number"

@@ -370,7 +370,10 @@ export default function AdminUserDetail() {
       await adminUsersApi.updateSubscription(userId, data);
       await loadUser();
     } catch (error) {
-      console.error('Failed to update subscription:', error);
+      notify.error(
+        getApiErrorMessage(error, t('admin.users.userActions.error')),
+        t('common.error'),
+      );
     } finally {
       setActionLoading(false);
     }
@@ -383,7 +386,10 @@ export default function AdminUserDetail() {
       await adminUsersApi.blockUser(userId);
       await loadUser();
     } catch (error) {
-      console.error('Failed to block user:', error);
+      notify.error(
+        getApiErrorMessage(error, t('admin.users.userActions.error')),
+        t('common.error'),
+      );
     } finally {
       setActionLoading(false);
     }
@@ -396,7 +402,10 @@ export default function AdminUserDetail() {
       await adminUsersApi.unblockUser(userId);
       await loadUser();
     } catch (error) {
-      console.error('Failed to unblock user:', error);
+      notify.error(
+        getApiErrorMessage(error, t('admin.users.userActions.error')),
+        t('common.error'),
+      );
     } finally {
       setActionLoading(false);
     }
@@ -417,7 +426,10 @@ export default function AdminUserDetail() {
       await loadUser();
       await loadSyncStatus();
     } catch (error) {
-      console.error('Failed to sync from panel:', error);
+      notify.error(
+        getApiErrorMessage(error, t('admin.users.userActions.error')),
+        t('common.error'),
+      );
     } finally {
       setActionLoading(false);
     }
@@ -435,7 +447,10 @@ export default function AdminUserDetail() {
       await loadUser();
       await loadSyncStatus();
     } catch (error) {
-      console.error('Failed to sync to panel:', error);
+      notify.error(
+        getApiErrorMessage(error, t('admin.users.userActions.error')),
+        t('common.error'),
+      );
     } finally {
       setActionLoading(false);
     }
