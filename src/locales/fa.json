@@ -1711,17 +1711,19 @@
           "type": "نوع",
           "displayName": "نام نمایشی",
           "value": "مقدار",
-          "valueKopeks": "ارزش (کوپک، برای RTP)",
+          "valueToman": "ارزش جایزه (تومان، برای RTP)",
+          "unitDays": "روز",
+          "unitGb": "گیگابایت",
           "emoji": "ایموجی",
           "color": "رنگ",
           "active": "فعال",
           "worth": "ارزش",
-          "probability": "احتمال دستی (۰–۱)",
+          "probability": "احتمال دستی (0–1)",
           "probabilityHint": "خالی = خودکار بر اساس RTP"
         },
         "promo": {
           "title": "تنظیمات کد تخفیف",
-          "balanceBonus": "جایزه موجودی (کوپک)",
+          "balanceBonus": "جایزه موجودی (تومان)",
           "subscriptionDays": "روز اشتراک"
         }
       },
