@@ -34,7 +34,7 @@ export function isC2cAwaitingReview(state: C2cReceiptState | null | undefined): 
 const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 const ARABIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 
-function toLatinDigits(value: string): string {
+export function toLatinDigits(value: string): string {
   return value
     .replace(/[۰-۹]/g, (digit) => String(PERSIAN_DIGITS.indexOf(digit)))
     .replace(/[٠-٩]/g, (digit) => String(ARABIC_DIGITS.indexOf(digit)));

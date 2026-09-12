@@ -130,6 +130,8 @@ const ReferralPartnerApply = lazyWithRetry(() => import('./pages/ReferralPartner
 const ReferralWithdrawalRequest = lazyWithRetry(() => import('./pages/ReferralWithdrawalRequest'));
 const AdminUsers = lazyWithRetry(() => import('./pages/AdminUsers'));
 const AdminPayments = lazyWithRetry(() => import('./pages/AdminPayments'));
+const AdminC2cReceipts = lazyWithRetry(() => import('./pages/AdminC2cReceipts'));
+const AdminC2cReceiptDetail = lazyWithRetry(() => import('./pages/AdminC2cReceiptDetail'));
 const AdminPaymentMethods = lazyWithRetry(() => import('./pages/AdminPaymentMethods'));
 const AdminPaymentMethodEdit = lazyWithRetry(() => import('./pages/AdminPaymentMethodEdit'));
 const AdminPromoOffers = lazyWithRetry(() => import('./pages/AdminPromoOffers'));
@@ -1135,6 +1137,26 @@ function App() {
             <PermissionRoute permission="payments:read">
               <LazyPage>
                 <AdminPayments />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/c2c-receipts"
+          element={
+            <PermissionRoute permission="payments:read">
+              <LazyPage>
+                <AdminC2cReceipts />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/c2c-receipts/:receiptId"
+          element={
+            <PermissionRoute permission="payments:read">
+              <LazyPage>
+                <AdminC2cReceiptDetail />
               </LazyPage>
             </PermissionRoute>
           }
