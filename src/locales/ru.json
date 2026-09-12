@@ -900,6 +900,9 @@
       },
       "apple_iap": {
         "description": "Оплата через Apple In-App Purchase"
+      },
+      "c2c": {
+        "description": "Перевод на нашу карту с отправкой чека"
       }
     },
     "transactionHistory": "История операций",
@@ -1007,7 +1010,47 @@
       "goToBalance": "Перейти к балансу",
       "tryAgain": "Попробовать снова"
     },
-    "top_up": "Пополнить баланс"
+    "top_up": "Пополнить баланс",
+    "c2c": {
+      "title": "Перевод на карту",
+      "toman": "томан",
+      "amountTitle": "На какую сумму пополнить?",
+      "limits": "От {{min}} до {{max}} томан",
+      "continue": "Показать карту",
+      "transferTitle": "Переведите ровно эту сумму",
+      "cardNumber": "Номер карты",
+      "cardHolder": "Владелец карты",
+      "amount": "Сумма",
+      "copy": "Копировать",
+      "copied": "Скопировано",
+      "expiresAt": "Переведите и отправьте чек до {{time}}",
+      "uploadTitle": "Отправьте чек",
+      "chooseImage": "Выбрать фото чека",
+      "changeImage": "Заменить фото",
+      "noteLabel": "Комментарий (необязательно)",
+      "notePlaceholder": "например, номер операции или время перевода",
+      "submit": "Отправить чек",
+      "sending": "Отправка…",
+      "cancel": "Отменить этот перевод",
+      "pendingTitle": "Чек получен",
+      "pendingMessage": "Ваш чек зарегистрирован и ожидает проверки. Баланс пополнится сразу после подтверждения.",
+      "receiptNumber": "Чек №{{id}}",
+      "approvedTitle": "Баланс пополнен",
+      "approvedMessage": "На баланс зачислено {{amount}} томан.",
+      "rejectedTitle": "Чек не подтверждён",
+      "rejectedReason": "Причина: {{reason}}",
+      "retry": "Начать новый перевод",
+      "backToBalance": "Вернуться к балансу",
+      "pendingBanner": "Ваш чек перевода на карту №{{id}} на {{amount}} томан ожидает проверки",
+      "pendingBannerAction": "Открыть",
+      "errors": {
+        "enterAmount": "Введите сумму",
+        "amountRange": "Сумма должна быть от {{min}} до {{max}} томан",
+        "emptyReceipt": "Выберите фото чека или опишите перевод",
+        "fileTooLarge": "Фото должно быть меньше 10 МБ",
+        "fileType": "Только изображения JPEG, PNG, GIF или WebP"
+      }
+    }
   },
   "referral": {
     "title": "Реферальная программа",
