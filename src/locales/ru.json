@@ -1474,6 +1474,7 @@
       "broadcasts": "Рассылки",
       "users": "Пользователи",
       "payments": "Платежи",
+      "c2cReceipts": "Card receipts",
       "remnawave": "Remnawave",
       "emailTemplates": "Email-шаблоны",
       "paymentMethods": "Платёжные методы",
@@ -1881,6 +1882,46 @@
       "prev": "Назад",
       "next": "Далее",
       "checkError": "Ошибка проверки статуса"
+    },
+    "c2cReceipts": {
+      "title": "Card-to-card receipts",
+      "description": "Review and search wallet top-up receipts",
+      "searchPlaceholder": "Search: #id, TG ID, @username, name, email, amount",
+      "searchHint": "Examples: #123, @username, 123456789, user@mail.com, 150000",
+      "searchResults": "Results for: {{query}}. Found {{count}}",
+      "resetSearch": "Reset",
+      "status": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "expired": "Expired",
+        "cancelled": "Cancelled"
+      },
+      "period": {
+        "24h": "24h",
+        "7d": "7 days",
+        "30d": "30 days",
+        "all": "All time",
+        "custom": "Range"
+      },
+      "dateFrom": "From",
+      "dateTo": "To",
+      "card": "Card",
+      "user": "User",
+      "created": "Submitted",
+      "processed": "Reviewed",
+      "credited": "Credited: {{amount}}",
+      "reviewedBy": "Reviewed by {{name}}",
+      "via": {
+        "bot": "via bot",
+        "cabinet": "via cabinet"
+      },
+      "noReceipt": "No receipt uploaded",
+      "empty": "No receipts found",
+      "prev": "Prev",
+      "next": "Next",
+      "page": "Page {{current}} of {{total}}"
     },
     "paymentMethods": {
       "title": "Платёжные методы",

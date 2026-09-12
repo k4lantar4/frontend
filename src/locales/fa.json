@@ -1344,6 +1344,7 @@
       "banSystem": "نظارت بر مسدودسازی",
       "campaigns": "کمپین‌ها",
       "payments": "پرداخت‌ها",
+      "c2cReceipts": "رسیدهای کارت به کارت",
       "promoOffers": "پیشنهادات تبلیغاتی",
       "promocodes": "کدهای تخفیف",
       "promoGroups": "گروه‌های تخفیف",
@@ -1990,6 +1991,46 @@
       "prev": "قبلی",
       "next": "بعدی",
       "checkError": "خطا در بررسی وضعیت"
+    },
+    "c2cReceipts": {
+      "title": "رسیدهای کارت به کارت",
+      "description": "بررسی و جستجوی رسیدهای شارژ کیف پول",
+      "searchPlaceholder": "جستجو: شماره رسید، آیدی تلگرام، @یوزرنیم، نام، ایمیل یا مبلغ",
+      "searchHint": "مثلاً: #123، @username، 123456789، user@mail.com، 150000",
+      "searchResults": "نتیجه‌ی جستجوی «{{query}}»: {{count}} مورد",
+      "resetSearch": "پاک کردن",
+      "status": {
+        "all": "همه",
+        "pending": "در انتظار",
+        "approved": "تأیید شده",
+        "rejected": "رد شده",
+        "expired": "منقضی",
+        "cancelled": "لغو شده"
+      },
+      "period": {
+        "24h": "24 ساعت",
+        "7d": "7 روز",
+        "30d": "30 روز",
+        "all": "همه‌ی زمان‌ها",
+        "custom": "بازه‌ی دلخواه"
+      },
+      "dateFrom": "از",
+      "dateTo": "تا",
+      "card": "کارت",
+      "user": "کاربر",
+      "created": "ثبت",
+      "processed": "بررسی",
+      "credited": "واریز شده: {{amount}}",
+      "reviewedBy": "بررسی توسط {{name}}",
+      "via": {
+        "bot": "از ربات",
+        "cabinet": "از کابینت"
+      },
+      "noReceipt": "رسیدی بارگذاری نشده",
+      "empty": "رسیدی پیدا نشد",
+      "prev": "قبلی",
+      "next": "بعدی",
+      "page": "صفحه‌ی {{current}} از {{total}}"
     },
     "settings": {
       "title": "تنظیمات سیستم",

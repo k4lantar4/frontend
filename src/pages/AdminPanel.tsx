@@ -136,6 +136,12 @@ const sections: AdminSection[] = [
         permission: 'payments:read',
       },
       {
+        name: 'admin.nav.c2cReceipts',
+        icon: 'file-text',
+        to: '/admin/c2c-receipts',
+        permission: 'payments:read',
+      },
+      {
         name: 'admin.nav.trafficUsage',
         icon: 'activity',
         to: '/admin/traffic-usage',
