@@ -22,6 +22,7 @@ import {
   type C2cReceiptFilters,
 } from '../utils/adminC2cReceipts';
 import { formatBalance } from '../utils/format';
+import { formatUserDateTime } from '../utils/formatDate';
 
 const STATUS_STYLES: Record<string, string> = {
   pending: 'bg-warning-500/20 text-warning-400',
@@ -58,7 +59,7 @@ function statusCount(stats: C2cReceiptStats | undefined, status: C2cStatusFilter
 }
 
 function ReceiptRow({ receipt, onOpen }: { receipt: C2cReceiptAdminItem; onOpen: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, reviewer } = receipt;
   const userName = user.username ? `@${user.username}` : user.full_name;
   const userContact = user.telegram_id ? `TG: ${user.telegram_id}` : user.email;
@@ -103,11 +104,13 @@ function ReceiptRow({ receipt, onOpen }: { receipt: C2cReceiptAdminItem; onOpen:
         </div>
         <div className="space-y-1 text-end text-xs text-dark-500">
           <div>
-            {t('admin.c2cReceipts.created')}: {new Date(receipt.created_at).toLocaleString()}
+            {t('admin.c2cReceipts.created')}:{' '}
+            {formatUserDateTime(receipt.created_at, i18n.language)}
           </div>
           {receipt.processed_at && (
             <div>
-              {t('admin.c2cReceipts.processed')}: {new Date(receipt.processed_at).toLocaleString()}
+              {t('admin.c2cReceipts.processed')}:{' '}
+              {formatUserDateTime(receipt.processed_at, i18n.language)}
             </div>
           )}
           {reviewer.label && (

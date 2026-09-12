@@ -22,6 +22,7 @@ import {
 import { getApiErrorMessage } from '../utils/api-error';
 import { catalogPriceInToman } from '../utils/catalogScale';
 import { formatBalance } from '../utils/format';
+import { formatUserDateTime } from '../utils/formatDate';
 import { C2cStatusBadge } from './AdminC2cReceipts';
 
 type Decision =
@@ -70,7 +71,7 @@ function ReceiptMedia({ receipt }: { receipt: C2cReceiptAdminDetail }) {
 }
 
 export default function AdminC2cReceiptDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { receiptId: receiptIdParam } = useParams<{ receiptId: string }>();
   const receiptId = Number(receiptIdParam);
@@ -217,11 +218,11 @@ export default function AdminC2cReceiptDetail() {
               </Field>
             )}
             <Field label={t('admin.c2cReceipts.detail.created')}>
-              {new Date(receipt.created_at).toLocaleString()}
+              {formatUserDateTime(receipt.created_at, i18n.language)}
             </Field>
             {receipt.expires_at && receipt.status === 'pending' && (
               <Field label={t('admin.c2cReceipts.detail.expires')}>
-                {new Date(receipt.expires_at).toLocaleString()}
+                {formatUserDateTime(receipt.expires_at, i18n.language)}
               </Field>
             )}
           </div>
@@ -292,7 +293,7 @@ export default function AdminC2cReceiptDetail() {
                 )}
                 {receipt.processed_at && (
                   <Field label={t('admin.c2cReceipts.detail.processed')}>
-                    {new Date(receipt.processed_at).toLocaleString()}
+                    {formatUserDateTime(receipt.processed_at, i18n.language)}
                   </Field>
                 )}
                 {receipt.rejection_reason_key && (
