@@ -78,6 +78,7 @@ const RenewSubscription = lazyWithRetry(() => import('./pages/RenewSubscription'
 const AutoLogin = lazyWithRetry(() => import('./pages/AutoLogin'));
 const TopUpMethodSelect = lazyWithRetry(() => import('./pages/TopUpMethodSelect'));
 const TopUpAmount = lazyWithRetry(() => import('./pages/TopUpAmount'));
+const TopUpC2C = lazyWithRetry(() => import('./pages/TopUpC2C'));
 const TopUpResult = lazyWithRetry(() => import('./pages/TopUpResult'));
 const ConnectedAccounts = lazyWithRetry(() => import('./pages/ConnectedAccounts'));
 const LinkTelegramCallback = lazyWithRetry(() => import('./pages/LinkTelegramCallback'));
@@ -445,6 +446,17 @@ function App() {
             <ProtectedRoute withLayout={false}>
               <LazyPage>
                 <TopUpResult />
+              </LazyPage>
+            </ProtectedRoute>
+          }
+        />
+        {/* Card-to-card has its own page; it must precede :methodId, which would swallow it. */}
+        <Route
+          path="/balance/top-up/c2c"
+          element={
+            <ProtectedRoute>
+              <LazyPage>
+                <TopUpC2C />
               </LazyPage>
             </ProtectedRoute>
           }

@@ -2,6 +2,9 @@
 import i18n from '../i18n';
 import type {
   Balance,
+  C2cReceiptState,
+  C2cReceiptSubmitPayload,
+  C2cSession,
   Transaction,
   PaymentMethod,
   PaginatedResponse,
@@ -150,5 +153,35 @@ export const balanceApi = {
   // Unlink (delete) a saved payment method
   deleteSavedCard: async (id: number): Promise<void> => {
     await apiClient.delete(`/cabinet/balance/saved-cards/${id}`);
+  },
+
+  // Card-to-card: assign a card and hold the user's single pending receipt (amount on the wire scale)
+  c2cStartSession: async (amountKopeks: number): Promise<C2cSession> => {
+    const response = await apiClient.post<C2cSession>('/cabinet/balance/c2c/session', {
+      amount_kopeks: amountKopeks,
+    });
+    return response.data;
+  },
+
+  // Card-to-card: attach the uploaded receipt image and/or a note, forwarded for review
+  c2cSubmitReceipt: async (payload: C2cReceiptSubmitPayload): Promise<C2cReceiptState> => {
+    const response = await apiClient.post<C2cReceiptState>('/cabinet/balance/c2c/receipt', payload);
+    return response.data;
+  },
+
+  // Card-to-card: the pending receipt (null when none), or — with receiptId — that receipt in any status
+  c2cGetCurrent: async (receiptId?: number): Promise<C2cReceiptState | null> => {
+    const response = await apiClient.get<C2cReceiptState | ''>('/cabinet/balance/c2c/current', {
+      params: receiptId ? { receipt_id: receiptId } : undefined,
+    });
+    return response.status === 204 || !response.data ? null : response.data;
+  },
+
+  // Card-to-card: cancel a pending receipt that has nothing attached yet
+  c2cCancel: async (receiptId: number): Promise<C2cReceiptState> => {
+    const response = await apiClient.post<C2cReceiptState>('/cabinet/balance/c2c/cancel', {
+      receipt_id: receiptId,
+    });
+    return response.data;
   },
 };

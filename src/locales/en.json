@@ -880,6 +880,9 @@
       },
       "apple_iap": {
         "description": "Pay via Apple In-App Purchase"
+      },
+      "c2c": {
+        "description": "Transfer to our card and send the receipt"
       }
     },
     "transactionHistory": "Transaction History",
@@ -987,7 +990,47 @@
       "goToBalance": "Go to Balance",
       "tryAgain": "Try Again"
     },
-    "top_up": "Top up balance"
+    "top_up": "Top up balance",
+    "c2c": {
+      "title": "Card-to-card",
+      "toman": "Toman",
+      "amountTitle": "How much do you want to top up?",
+      "limits": "From {{min}} to {{max}} Toman",
+      "continue": "Show the card",
+      "transferTitle": "Transfer exactly this amount",
+      "cardNumber": "Card number",
+      "cardHolder": "Card holder",
+      "amount": "Amount",
+      "copy": "Copy",
+      "copied": "Copied",
+      "expiresAt": "Transfer and send the receipt by {{time}}",
+      "uploadTitle": "Send the receipt",
+      "chooseImage": "Choose the receipt image",
+      "changeImage": "Change image",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "e.g. tracking number or transfer time",
+      "submit": "Send receipt",
+      "sending": "Sending…",
+      "cancel": "Cancel this transfer",
+      "pendingTitle": "Receipt received",
+      "pendingMessage": "Your receipt is registered and waiting for review. Your balance is topped up as soon as it is approved.",
+      "receiptNumber": "Receipt #{{id}}",
+      "approvedTitle": "Balance topped up",
+      "approvedMessage": "{{amount}} Toman was added to your balance.",
+      "rejectedTitle": "Receipt not approved",
+      "rejectedReason": "Reason: {{reason}}",
+      "retry": "Start a new transfer",
+      "backToBalance": "Back to balance",
+      "pendingBanner": "Your card-to-card receipt #{{id}} for {{amount}} Toman is waiting for review",
+      "pendingBannerAction": "View",
+      "errors": {
+        "enterAmount": "Enter an amount",
+        "amountRange": "The amount must be between {{min}} and {{max}} Toman",
+        "emptyReceipt": "Choose the receipt image or write the transfer details",
+        "fileTooLarge": "The image must be smaller than 10 MB",
+        "fileType": "Only JPEG, PNG, GIF or WebP images"
+      }
+    }
   },
   "referral": {
     "title": "Referral Program",

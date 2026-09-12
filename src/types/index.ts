@@ -949,3 +949,44 @@ export interface MergeResponse {
   refresh_token: string | null;
   user: User | null;
 }
+
+// Card-to-card top-up (/cabinet/balance/c2c/*). `amount_kopeks` is the wire scale (Toman x100);
+// `amount_toman` / `approved_amount_toman` are the same amounts 1:1 — format those.
+export type C2cReceiptStatus = 'pending' | 'approved' | 'rejected' | 'expired' | 'cancelled';
+
+export interface C2cSession {
+  receipt_id: number;
+  status: C2cReceiptStatus;
+  amount_kopeks: number;
+  amount_toman: number;
+  card_label: string;
+  card_number: string;
+  card_holder: string | null;
+  guide_text: string;
+  expires_at: string | null;
+}
+
+export interface C2cReceiptState {
+  receipt_id: number;
+  status: C2cReceiptStatus;
+  has_receipt: boolean;
+  amount_kopeks: number;
+  amount_toman: number;
+  approved_amount_toman: number | null;
+  rejection_reason: string | null;
+  card_label: string | null;
+  // Set only while the transfer is still due (pending, nothing attached).
+  card_number: string | null;
+  card_holder: string | null;
+  guide_text: string | null;
+  created_at: string;
+  expires_at: string | null;
+  processed_at: string | null;
+}
+
+export interface C2cReceiptSubmitPayload {
+  receipt_id: number;
+  media_file_id?: string;
+  media_type?: 'photo' | 'document';
+  text?: string;
+}
