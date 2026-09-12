@@ -26,6 +26,7 @@ import { useDestructiveConfirm } from '@/platform';
 import { useNotify } from '@/platform/hooks/useNotify';
 import FortuneWheel from '../components/wheel/FortuneWheel';
 import { ColorPicker } from '@/components/ColorPicker';
+import { catalogPriceInToman, tomanToCatalogKopeks } from '@/utils/catalogScale';
 import {
   AdjustmentsIcon,
   BackIcon,
@@ -128,7 +129,7 @@ function SortablePrizeCard({
           <div className="truncate font-semibold text-dark-100">{prize.display_name}</div>
           <div className="truncate text-xs text-dark-400 sm:text-sm">
             {t(`admin.wheel.prizes.types.${prize.prize_type}`)} •{' '}
-            {(prize.prize_value_kopeks / 100).toFixed(0)}
+            {catalogPriceInToman(prize.prize_value_kopeks)}
             {currencySymbol}
           </div>
         </div>
@@ -904,13 +905,13 @@ export default function AdminWheel() {
             />
             <StatCard
               label={t('admin.wheel.statistics.revenue')}
-              value={formatWithCurrency(stats.total_revenue_kopeks / 100, 0)}
+              value={formatWithCurrency(catalogPriceInToman(stats.total_revenue_kopeks), 0)}
               icon={<WalletIcon className="h-5 w-5" />}
               tone="success"
             />
             <StatCard
               label={t('admin.wheel.statistics.payouts')}
-              value={formatWithCurrency(stats.total_payout_kopeks / 100, 0)}
+              value={formatWithCurrency(catalogPriceInToman(stats.total_payout_kopeks), 0)}
               icon={<GiftIcon className="h-5 w-5" />}
               tone="warning"
             />
@@ -942,7 +943,7 @@ export default function AdminWheel() {
               items={stats.top_wins.slice(0, 8).map((win, i) => ({
                 key: `${win.user_id}-${i}`,
                 label: `${win.username || `#${win.user_id}`} · ${win.prize_display_name}`,
-                value: win.prize_value_kopeks / 100,
+                value: catalogPriceInToman(win.prize_value_kopeks),
               }))}
               valueFormatter={(v) => formatWithCurrency(v, 0)}
             />
@@ -985,10 +986,10 @@ function InlinePrizeForm({
     display_name: prize?.display_name || '',
     emoji: prize?.emoji || '🎁',
     color: prize?.color || '#3B82F6',
-    prize_value_kopeks: prize?.prize_value_kopeks || 0,
+    prize_value_kopeks: catalogPriceInToman(prize?.prize_value_kopeks ?? 0),
     is_active: prize?.is_active ?? true,
     manual_probability: prize?.manual_probability || null,
-    promo_balance_bonus_kopeks: prize?.promo_balance_bonus_kopeks || 0,
+    promo_balance_bonus_kopeks: catalogPriceInToman(prize?.promo_balance_bonus_kopeks ?? 0),
     promo_subscription_days: prize?.promo_subscription_days || 0,
     promo_traffic_gb: prize?.promo_traffic_gb || 0,
   });
@@ -998,8 +999,10 @@ function InlinePrizeForm({
     onSave({
       ...formData,
       prize_value: toNumber(formData.prize_value),
-      prize_value_kopeks: toNumber(formData.prize_value_kopeks),
-      promo_balance_bonus_kopeks: toNumber(formData.promo_balance_bonus_kopeks),
+      prize_value_kopeks: tomanToCatalogKopeks(toNumber(formData.prize_value_kopeks)),
+      promo_balance_bonus_kopeks: tomanToCatalogKopeks(
+        toNumber(formData.promo_balance_bonus_kopeks),
+      ),
       promo_subscription_days: toNumber(formData.promo_subscription_days),
       promo_traffic_gb: toNumber(formData.promo_traffic_gb),
     });
@@ -1059,10 +1062,10 @@ function InlinePrizeForm({
             <label className="mb-2 block text-sm font-medium text-dark-300">
               {t('admin.wheel.prizes.fields.value')} (
               {formData.prize_type === 'balance_bonus'
-                ? 'kopeks'
+                ? currencySymbol
                 : formData.prize_type === 'subscription_days'
-                  ? 'days'
-                  : 'GB'}
+                  ? t('admin.wheel.prizes.fields.unitDays')
+                  : t('admin.wheel.prizes.fields.unitGb')}
               )
             </label>
             <input
@@ -1080,10 +1083,10 @@ function InlinePrizeForm({
           </div>
         )}
 
-        {/* Prize value in kopeks (for RTP calculation) */}
+        {/* Prize cost in Toman (for RTP calculation) */}
         <div>
           <label className="mb-2 block text-sm font-medium text-dark-300">
-            {t('admin.wheel.prizes.fields.valueKopeks')}
+            {t('admin.wheel.prizes.fields.valueToman')}
           </label>
           <input
             type="number"
@@ -1097,9 +1100,6 @@ function InlinePrizeForm({
             min={0}
             className="input w-full"
           />
-          <p className="mt-1 text-xs text-dark-500">
-            = {(toNumber(formData.prize_value_kopeks) / 100).toFixed(2)} {currencySymbol}
-          </p>
         </div>
 
         {/* Emoji */}

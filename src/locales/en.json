@@ -1847,8 +1847,8 @@
       "description": "Description",
       "descriptionHint": "Shown under the method name. Empty for default text",
       "subOptions": "Payment options",
-      "minAmount": "Min amount (kopeks)",
-      "maxAmount": "Max amount (kopeks)",
+      "minAmount": "Min amount (Toman)",
+      "maxAmount": "Max amount (Toman)",
       "quickAmounts": "Quick amounts (₽)",
       "quickAmountsHint": "Quick top-up amount buttons. Empty — defaults are used: {{defaults}} ₽",
       "quickAmountsPlaceholder": "Amount in rubles",
@@ -2100,7 +2100,9 @@
           "type": "Type",
           "displayName": "Display Name",
           "value": "Value",
-          "valueKopeks": "Value in Kopeks (for RTP)",
+          "valueToman": "Prize cost in Toman (for RTP)",
+          "unitDays": "days",
+          "unitGb": "GB",
           "emoji": "Emoji",
           "color": "Color",
           "active": "Active",
@@ -2110,7 +2112,7 @@
         },
         "promo": {
           "title": "Promo Code Settings",
-          "balanceBonus": "Balance bonus (kopeks)",
+          "balanceBonus": "Balance bonus (Toman)",
           "subscriptionDays": "Subscription days"
         }
       },
