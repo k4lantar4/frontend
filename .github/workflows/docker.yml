@@ -5,8 +5,8 @@ on:
     branches: [main]
     tags:
       - 'v*'
-  pull_request:
-    branches: [main]
+  # Not on pull_request: a PR build pushes nothing, and CI's `build` job plus
+  # its lint call already cover the same ground there.
 
 env:
   REGISTRY: ghcr.io
