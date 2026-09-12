@@ -5271,8 +5271,8 @@
       "methodDescription": "Описание метода",
       "methodDisplayName": "Отображаемое имя",
       "methodIconUrl": "URL иконки",
-      "methodMaxAmount": "Максимальная сумма",
-      "methodMinAmount": "Минимальная сумма",
+      "methodMaxAmount": "Макс. сумма (томан)",
+      "methodMinAmount": "Мин. сумма (томан)",
       "methodReturnUrl": "URL возврата",
       "stickyPayButton": "Закреплённая кнопка оплаты"
     },

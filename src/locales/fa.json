@@ -4362,8 +4362,8 @@
       "methodDescription": "توضیحات روش",
       "methodDisplayName": "نام نمایشی",
       "methodIconUrl": "آدرس نماد",
-      "methodMaxAmount": "حداکثر مبلغ",
-      "methodMinAmount": "حداقل مبلغ",
+      "methodMaxAmount": "حداکثر مبلغ (تومان)",
+      "methodMinAmount": "حداقل مبلغ (تومان)",
       "methodReturnUrl": "آدرس بازگشت",
       "stickyPayButton": "دکمه پرداخت ثابت"
     },
