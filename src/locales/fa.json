@@ -344,8 +344,10 @@
     "extraDevicesIncluded_other": "شامل {{count}} کاربر اضافی",
     "baseTariff": "تعرفه",
     "serversLabel": "سرورها",
+    "servers_one": "{{count}} سرور",
     "servers_other": "{{count}} سرور",
     "locationsLabel": "مکان‌ها",
+    "locations_one": "{{count}} مکان",
     "locations_other": "{{count}} مکان",
     "trafficReset": {
       "DAY": "بازنشانی روزانه",
