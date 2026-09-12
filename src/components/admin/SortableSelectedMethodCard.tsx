@@ -5,11 +5,25 @@ import { PiCaretDown } from 'react-icons/pi';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '../../lib/utils';
 import { CheckIcon } from '@/components/icons';
+import { catalogPriceInToman, tomanToCatalogKopeks } from '@/utils/catalogScale';
 import { GripIcon, TrashIcon } from '../icons/LandingIcons';
 import type { AdminLandingPaymentMethod, EditableMethodField } from '../../api/landings';
 import type { PaymentMethodSubOptionInfo } from '../../types';
 
 export type MethodWithId = AdminLandingPaymentMethod & { _id: string };
+
+/**
+ * A landing's per-method limit, from the wire scale the admin API speaks (Toman x100) to the Toman
+ * the owner types. The field used to show and accept the raw wire number under a unit-less label,
+ * so a typed limit was stored 100x too small (FINDINGS F-075); the conversion now happens at the
+ * form edge, as in AdminPaymentMethodEdit.
+ */
+const limitInToman = (amountKopeks: number | null): number | '' =>
+  amountKopeks == null ? '' : catalogPriceInToman(amountKopeks);
+
+/** The typed Toman back on the wire; an emptied field clears the limit rather than setting 0. */
+const limitOnWire = (typed: string): number | null =>
+  typed ? tomanToCatalogKopeks(Math.max(0, Math.floor(Number(typed)))) : null;
 
 const ChevronDownIcon = ({ open }: { open: boolean }) => (
   <PiCaretDown className={cn('h-5 w-5 transition-transform', open && 'rotate-180')} />
@@ -115,40 +129,40 @@ export function SortableSelectedMethodCard({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs text-dark-500">
-                {t('admin.landings.methodMinAmount', 'Min amount (kopeks)')}
+              <label
+                htmlFor={`${method._id}-min-amount`}
+                className="mb-1 block text-xs text-dark-500"
+              >
+                {t('admin.landings.methodMinAmount', 'Min amount (Toman)')}
               </label>
               <input
+                id={`${method._id}-min-amount`}
                 type="number"
                 min={0}
                 step={1}
-                value={method.min_amount_kopeks ?? ''}
+                value={limitInToman(method.min_amount_kopeks)}
                 onChange={(e) =>
-                  onUpdate(
-                    method.method_id,
-                    'min_amount_kopeks',
-                    e.target.value ? Math.max(0, Math.floor(Number(e.target.value))) : null,
-                  )
+                  onUpdate(method.method_id, 'min_amount_kopeks', limitOnWire(e.target.value))
                 }
                 placeholder="—"
                 className="w-full rounded-lg border border-dark-700 bg-dark-800 px-3 py-1.5 text-sm text-dark-100 outline-none focus:border-accent-500"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs text-dark-500">
-                {t('admin.landings.methodMaxAmount', 'Max amount (kopeks)')}
+              <label
+                htmlFor={`${method._id}-max-amount`}
+                className="mb-1 block text-xs text-dark-500"
+              >
+                {t('admin.landings.methodMaxAmount', 'Max amount (Toman)')}
               </label>
               <input
+                id={`${method._id}-max-amount`}
                 type="number"
                 min={0}
                 step={1}
-                value={method.max_amount_kopeks ?? ''}
+                value={limitInToman(method.max_amount_kopeks)}
                 onChange={(e) =>
-                  onUpdate(
-                    method.method_id,
-                    'max_amount_kopeks',
-                    e.target.value ? Math.max(0, Math.floor(Number(e.target.value))) : null,
-                  )
+                  onUpdate(method.method_id, 'max_amount_kopeks', limitOnWire(e.target.value))
                 }
                 placeholder="—"
                 className="w-full rounded-lg border border-dark-700 bg-dark-800 px-3 py-1.5 text-sm text-dark-100 outline-none focus:border-accent-500"

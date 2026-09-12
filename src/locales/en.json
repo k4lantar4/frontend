@@ -4734,8 +4734,8 @@
       "methodDescription": "Method description",
       "methodDisplayName": "Display name",
       "methodIconUrl": "Icon URL",
-      "methodMaxAmount": "Maximum amount",
-      "methodMinAmount": "Minimum amount",
+      "methodMaxAmount": "Max amount (Toman)",
+      "methodMinAmount": "Min amount (Toman)",
       "methodReturnUrl": "Return URL",
       "stickyPayButton": "Sticky pay button"
     },
