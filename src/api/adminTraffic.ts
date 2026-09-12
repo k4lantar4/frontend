@@ -38,7 +38,9 @@ export interface ExportCsvResponse {
 
 export interface TrafficEnrichmentData {
   devices_connected: number;
+  /** Legacy twin — a raw Toman sum despite the name; read `total_spent_toman` instead. */
   total_spent_kopeks: number;
+  total_spent_toman?: number;
   subscription_start_date: string | null;
   subscription_end_date: string | null;
   last_node_name: string | null;
