@@ -4,6 +4,8 @@ import {
   buildC2cListParams,
   buildC2cRejectPayload,
   buildC2cStatsParams,
+  c2cFiltersFromSearchParams,
+  c2cFiltersToSearchParams,
   canDecideC2cReceipt,
   DEFAULT_C2C_FILTERS,
   isDefaultC2cFilters,
@@ -23,6 +25,44 @@ const NOW = new Date('2026-09-12T12:00:00.000Z');
 const filters = (over: Partial<C2cReceiptFilters> = {}): C2cReceiptFilters => ({
   ...DEFAULT_C2C_FILTERS,
   ...over,
+});
+
+// Working a queue means opening a receipt and coming back: the filters live in the URL so Back
+// (which returns to the list's full path) lands on the same status, search, period and page.
+describe('c2c filters in the URL', () => {
+  it('keeps the default queue URL clean', () => {
+    expect(c2cFiltersToSearchParams(filters(), 1).toString()).toBe('');
+    expect(c2cFiltersFromSearchParams(new URLSearchParams())).toEqual({
+      filters: DEFAULT_C2C_FILTERS,
+      page: 1,
+    });
+  });
+
+  it('round-trips status, search, custom range and page', () => {
+    const state = filters({
+      status: 'pending',
+      search: '@ali',
+      period: 'custom',
+      dateFrom: '2026-09-01',
+      dateTo: '2026-09-10',
+    });
+    const params = c2cFiltersToSearchParams(state, 3);
+    expect(c2cFiltersFromSearchParams(new URLSearchParams(params.toString()))).toEqual({
+      filters: state,
+      page: 3,
+    });
+  });
+
+  it('drops dates outside a custom period and ignores tampered values', () => {
+    expect(
+      c2cFiltersToSearchParams(filters({ period: '7d', dateFrom: '2026-09-01' }), 1).toString(),
+    ).toBe('period=7d');
+    expect(
+      c2cFiltersFromSearchParams(
+        new URLSearchParams('status=paid&period=1y&from=yesterday&to=2026-09-10&page=-2'),
+      ),
+    ).toEqual({ filters: { ...DEFAULT_C2C_FILTERS, dateTo: '2026-09-10' }, page: 1 });
+  });
 });
 
 describe('buildC2cListParams', () => {

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AdminBackButton, backTo } from '@/components/admin';
@@ -15,7 +15,8 @@ import { DateField } from '../components/DateField';
 import {
   buildC2cListParams,
   buildC2cStatsParams,
-  DEFAULT_C2C_FILTERS,
+  c2cFiltersFromSearchParams,
+  c2cFiltersToSearchParams,
   isDefaultC2cFilters,
   type C2cPeriod,
   type C2cReceiptFilters,
@@ -126,24 +127,37 @@ export default function AdminC2cReceipts() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [searchInput, setSearchInput] = useState('');
-  const [filters, setFilters] = useState<C2cReceiptFilters>(DEFAULT_C2C_FILTERS);
-  const [page, setPage] = useState(1);
+  // Filters and page live in the URL, so Back from a receipt returns to the same queue.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { filters, page } = c2cFiltersFromSearchParams(searchParams);
+  const [searchInput, setSearchInput] = useState(filters.search);
 
-  const updateFilters = (patch: Partial<C2cReceiptFilters>) => {
-    setFilters((prev) => ({ ...prev, ...patch }));
-    setPage(1);
-  };
+  const writeListState = useCallback(
+    (next: (current: C2cReceiptFilters, currentPage: number) => [C2cReceiptFilters, number]) => {
+      setSearchParams(
+        (prev) => {
+          const current = c2cFiltersFromSearchParams(prev);
+          const [nextFilters, nextPage] = next(current.filters, current.page);
+          return c2cFiltersToSearchParams(nextFilters, nextPage);
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const updateFilters = (patch: Partial<C2cReceiptFilters>) =>
+    writeListState((current) => [{ ...current, ...patch }, 1]);
+  const setPage = (nextPage: number) => writeListState((current) => [current, nextPage]);
 
   // Debounce search input (300ms)
   useEffect(() => {
     if (searchInput === filters.search) return;
     const timer = setTimeout(() => {
-      setFilters((prev) => ({ ...prev, search: searchInput }));
-      setPage(1);
+      writeListState((current) => [{ ...current, search: searchInput }, 1]);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchInput, filters.search]);
+  }, [searchInput, filters.search, writeListState]);
 
   const listParams = buildC2cListParams(filters, page);
   const statsParams = buildC2cStatsParams(filters);
@@ -202,6 +216,7 @@ export default function AdminC2cReceipts() {
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            aria-label={t('admin.c2cReceipts.searchPlaceholder')}
             placeholder={t('admin.c2cReceipts.searchPlaceholder')}
             className="w-full rounded-xl border border-dark-700 bg-dark-800 py-3 pe-4 ps-10 text-dark-100 placeholder-dark-500 transition-colors focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
           />
@@ -330,7 +345,7 @@ export default function AdminC2cReceipts() {
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-dark-500">
             <button
               type="button"
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              onClick={() => setPage(Math.max(1, page - 1))}
               disabled={receipts.page <= 1}
               className="btn-secondary min-w-[100px] flex-1 text-xs disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:text-sm"
             >
@@ -341,7 +356,7 @@ export default function AdminC2cReceipts() {
             </div>
             <button
               type="button"
-              onClick={() => setPage((prev) => Math.min(receipts.pages, prev + 1))}
+              onClick={() => setPage(Math.min(receipts.pages, page + 1))}
               disabled={receipts.page >= receipts.pages}
               className="btn-secondary min-w-[100px] flex-1 text-xs disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:text-sm"
             >

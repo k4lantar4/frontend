@@ -81,6 +81,60 @@ export function buildC2cListParams(
   };
 }
 
+const STATUS_VALUES: readonly C2cStatusFilter[] = [
+  'all',
+  'pending',
+  'approved',
+  'rejected',
+  'expired',
+  'cancelled',
+];
+const PERIOD_VALUES: readonly C2cPeriod[] = ['24h', '7d', '30d', 'all', 'custom'];
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function pick<T extends string>(value: string | null, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+/**
+ * List state lives in the URL (`status`, `q`, `period`, `from`, `to`, `page`) so opening a receipt
+ * and pressing Back returns to the same queue. Unknown values fall back to the defaults.
+ */
+export function c2cFiltersFromSearchParams(params: URLSearchParams): {
+  filters: C2cReceiptFilters;
+  page: number;
+} {
+  const from = params.get('from') ?? '';
+  const to = params.get('to') ?? '';
+  const page = Number(params.get('page'));
+  return {
+    filters: {
+      status: pick(params.get('status'), STATUS_VALUES, 'all'),
+      search: params.get('q') ?? '',
+      period: pick(params.get('period'), PERIOD_VALUES, 'all'),
+      dateFrom: DAY_RE.test(from) ? from : '',
+      dateTo: DAY_RE.test(to) ? to : '',
+    },
+    page: Number.isInteger(page) && page > 1 ? page : 1,
+  };
+}
+
+export function c2cFiltersToSearchParams(
+  filters: C2cReceiptFilters,
+  page: number,
+): URLSearchParams {
+  const params = new URLSearchParams();
+  if (filters.status !== 'all') params.set('status', filters.status);
+  if (filters.search.trim()) params.set('q', filters.search);
+  if (filters.period !== 'all') params.set('period', filters.period);
+  if (filters.period === 'custom') {
+    if (filters.dateFrom) params.set('from', filters.dateFrom);
+    if (filters.dateTo) params.set('to', filters.dateTo);
+  }
+  if (page > 1) params.set('page', String(page));
+  return params;
+}
+
 /** Auto-refresh only while the owner is watching the default queue, as AdminPayments does. */
 export function isDefaultC2cFilters(filters: C2cReceiptFilters): boolean {
   return !filters.search.trim() && filters.status === 'all' && filters.period === 'all';
