@@ -47,15 +47,12 @@ export function ServerManagementSheet({
   isDark,
 }: ServerManagementSheetProps) {
   const { t } = useTranslation();
-  const { currencySymbol } = useCurrency();
+  const { formatAmount, currencySymbol } = useCurrency();
   const queryClient = useQueryClient();
 
-  const formatPrice = (kopeks: number) => {
-    const rubles = kopeks / 100;
-    return rubles % 1 === 0
-      ? `${rubles} ${currencySymbol}`
-      : `${rubles.toFixed(2)} ${currencySymbol}`;
-  };
+  // Catalog prices arrive on the x100 wire scale; formatAmount adds the
+  // thousands separator (Latin digits for fa), same as SwitchTariffSheet.
+  const formatPrice = (kopeks: number) => `${formatAmount(kopeks / 100)} ${currencySymbol}`;
 
   const { data: countriesData, isLoading: countriesLoading } = useQuery({
     queryKey: ['countries', subscriptionId],
