@@ -774,6 +774,9 @@
       },
       "apple_iap": {
         "description": "پرداخت از طریق Apple In-App Purchase"
+      },
+      "c2c": {
+        "description": "واریز به کارت ما و ارسال رسید"
       }
     },
     "transactionHistory": "تاریخچه تراکنش‌ها",
@@ -879,7 +882,47 @@
       "goToBalance": "مشاهده موجودی",
       "tryAgain": "تلاش مجدد"
     },
-    "top_up": "افزایش موجودی"
+    "top_up": "افزایش موجودی",
+    "c2c": {
+      "title": "کارت به کارت",
+      "toman": "تومان",
+      "amountTitle": "چه مبلغی می‌خواهید شارژ کنید؟",
+      "limits": "از {{min}} تا {{max}} تومان",
+      "continue": "نمایش شماره کارت",
+      "transferTitle": "دقیقاً همین مبلغ را واریز کنید",
+      "cardNumber": "شماره کارت",
+      "cardHolder": "به نام",
+      "amount": "مبلغ",
+      "copy": "کپی",
+      "copied": "کپی شد",
+      "expiresAt": "تا {{time}} واریز کنید و رسید را بفرستید",
+      "uploadTitle": "ارسال رسید",
+      "chooseImage": "انتخاب عکس رسید",
+      "changeImage": "تغییر عکس",
+      "noteLabel": "توضیح (اختیاری)",
+      "notePlaceholder": "مثلاً کد پیگیری یا ساعت واریز",
+      "submit": "ارسال رسید",
+      "sending": "در حال ارسال…",
+      "cancel": "لغو این واریز",
+      "pendingTitle": "رسید دریافت شد",
+      "pendingMessage": "رسید شما ثبت شد و در انتظار بررسی است. به محض تأیید، موجودی‌تان شارژ می‌شود.",
+      "receiptNumber": "رسید شماره {{id}}",
+      "approvedTitle": "موجودی شارژ شد",
+      "approvedMessage": "{{amount}} تومان به موجودی شما اضافه شد.",
+      "rejectedTitle": "رسید تأیید نشد",
+      "rejectedReason": "دلیل: {{reason}}",
+      "retry": "شروع واریز جدید",
+      "backToBalance": "بازگشت به موجودی",
+      "pendingBanner": "رسید کارت به کارت شماره {{id}} به مبلغ {{amount}} تومان در انتظار بررسی است",
+      "pendingBannerAction": "مشاهده",
+      "errors": {
+        "enterAmount": "مبلغ را وارد کنید",
+        "amountRange": "مبلغ باید بین {{min}} و {{max}} تومان باشد",
+        "emptyReceipt": "عکس رسید را انتخاب کنید یا مشخصات واریز را بنویسید",
+        "fileTooLarge": "حجم عکس باید کمتر از 10 مگابایت باشد",
+        "fileType": "فقط عکس با فرمت JPEG، PNG، GIF یا WebP"
+      }
+    }
   },
   "referral": {
     "title": "برنامه معرفی",

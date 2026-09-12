@@ -17,6 +17,7 @@ import { ChevronDownIcon, ChevronRightIcon, CreditCardIcon, WalletIcon } from '@
 import { staggerContainer, staggerItem } from '@/components/motion/transitions';
 import { isPaidStatus, isFailedStatus } from '../utils/paymentStatus';
 import { Skeleton, SkeletonGroup } from '@/components/ui/skeleton';
+import C2cPendingBanner from '../components/C2cPendingBanner';
 
 export default function Balance() {
   const { t } = useTranslation();
@@ -84,6 +85,13 @@ export default function Balance() {
   const { data: paymentMethods } = useQuery({
     queryKey: ['payment-methods'],
     queryFn: balanceApi.getPaymentMethods,
+  });
+
+  // A card-to-card receipt still under review (same key the card-to-card page fills).
+  const { data: c2cReceipt } = useQuery({
+    queryKey: ['c2c-current', 'pending'],
+    queryFn: () => balanceApi.c2cGetCurrent(),
+    enabled: !!paymentMethods?.some((method) => method.id === 'c2c'),
   });
 
   // Deferred: only fetch saved cards after payment methods loaded to avoid extra request on first render.
@@ -206,6 +214,8 @@ export default function Balance() {
       <motion.div variants={staggerItem}>
         <h1 className="text-2xl font-bold text-dark-50 sm:text-3xl">{t('balance.title')}</h1>
       </motion.div>
+
+      <C2cPendingBanner receipt={c2cReceipt} onOpen={() => navigate('/balance/top-up/c2c')} />
 
       {/* Balance Card — flat surface; the giant numeric carries the
           weight. The previous accent gradient + glow leaked accent into
