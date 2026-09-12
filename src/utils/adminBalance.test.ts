@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { activityAmountToman, adminBalanceUpdatePayload, paymentsTotalToman } from './adminBalance';
+import {
+  activityAmountToman,
+  adminBalanceUpdatePayload,
+  bulkAddBalanceParams,
+  paymentsTotalToman,
+} from './adminBalance';
 
 describe('paymentsTotalToman', () => {
   it('uses the backend Toman total (C2C deposits are 1:1)', () => {
@@ -53,5 +58,21 @@ describe('activityAmountToman', () => {
 
   it('returns null when there is no amount', () => {
     expect(activityAmountToman({ amount_kopeks: null })).toBeNull();
+  });
+});
+
+describe('bulkAddBalanceParams', () => {
+  it('sends the typed Toman as amount_display, credited 1:1', () => {
+    expect(bulkAddBalanceParams(50_000)).toEqual({ amount_display: 50_000 });
+  });
+
+  it('never multiplies by 100 (F-068: every selected user was credited 100x)', () => {
+    const params = bulkAddBalanceParams(1_000_000);
+    expect(params.amount_display).toBe(1_000_000);
+    expect('amount_kopeks' in params).toBe(false);
+  });
+
+  it('rounds a typed fraction to whole Toman', () => {
+    expect(bulkAddBalanceParams(10_000.4).amount_display).toBe(10_000);
   });
 });
