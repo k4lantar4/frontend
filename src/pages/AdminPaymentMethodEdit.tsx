@@ -10,6 +10,7 @@ import { usePlatform } from '../platform/hooks/usePlatform';
 import { useHapticFeedback } from '../platform/hooks/useHaptic';
 import { useDestructiveConfirm } from '../platform/hooks/useNativeDialog';
 import { createNumberInputHandler, toNumber } from '../utils/inputHelpers';
+import { catalogPriceInToman, tomanToCatalogKopeks } from '../utils/catalogScale';
 import { localeMap } from '../utils/withdrawalUtils';
 import { useCurrency } from '../hooks/useCurrency';
 import { PermissionGate } from '@/components/auth/PermissionGate';
@@ -257,15 +258,21 @@ export default function AdminPaymentMethodEdit() {
       setCustomName(config.display_name || '');
       setCustomDesc(config.description || '');
       setSubOptions(config.sub_options || {});
-      setMinAmount(config.min_amount_kopeks ?? '');
-      setMaxAmount(config.max_amount_kopeks ?? '');
+      // The API still speaks the x100 catalog wire; the form asks the owner for Toman, the
+      // same unit as the quick amounts right below it (F-070).
+      setMinAmount(
+        config.min_amount_kopeks != null ? catalogPriceInToman(config.min_amount_kopeks) : '',
+      );
+      setMaxAmount(
+        config.max_amount_kopeks != null ? catalogPriceInToman(config.max_amount_kopeks) : '',
+      );
       setUserTypeFilter(config.user_type_filter);
       setFirstTopupFilter(config.first_topup_filter);
       setPromoGroupFilterMode(config.promo_group_filter_mode);
       setSelectedPromoGroupIds(config.allowed_promo_group_ids);
       // ?? false — защита от stale-config (backend ещё не пришёл с миграцией)
       setOpenUrlDirect(config.open_url_direct ?? false);
-      setQuickAmounts((config.quick_amounts ?? []).map((kopeks) => kopeks / 100));
+      setQuickAmounts((config.quick_amounts ?? []).map(catalogPriceInToman));
     }
   }, [config]);
 
@@ -311,20 +318,18 @@ export default function AdminPaymentMethodEdit() {
 
     // Amounts
     if (minAmount !== '') {
-      data.min_amount_kopeks = toNumber(minAmount) || null;
+      data.min_amount_kopeks = tomanToCatalogKopeks(toNumber(minAmount)) || null;
     } else {
       data.reset_min_amount = true;
     }
     if (maxAmount !== '') {
-      data.max_amount_kopeks = toNumber(maxAmount) || null;
+      data.max_amount_kopeks = tomanToCatalogKopeks(toNumber(maxAmount)) || null;
     } else {
       data.reset_max_amount = true;
     }
 
     if (quickAmounts.length > 0) {
-      data.quick_amounts = [...quickAmounts]
-        .sort((a, b) => a - b)
-        .map((rubles) => Math.round(rubles * 100));
+      data.quick_amounts = [...quickAmounts].sort((a, b) => a - b).map(tomanToCatalogKopeks);
     } else {
       data.reset_quick_amounts = true;
     }
@@ -552,7 +557,7 @@ export default function AdminPaymentMethodEdit() {
               type="number"
               value={minAmount}
               onChange={createNumberInputHandler(setMinAmount, 0)}
-              placeholder={config.default_min_amount_kopeks.toString()}
+              placeholder={catalogPriceInToman(config.default_min_amount_kopeks).toString()}
               className="input"
             />
           </div>
@@ -564,7 +569,7 @@ export default function AdminPaymentMethodEdit() {
               type="number"
               value={maxAmount}
               onChange={createNumberInputHandler(setMaxAmount, 0)}
-              placeholder={config.default_max_amount_kopeks.toString()}
+              placeholder={catalogPriceInToman(config.default_max_amount_kopeks).toString()}
               className="input"
             />
           </div>
@@ -614,9 +619,7 @@ export default function AdminPaymentMethodEdit() {
           {quickAmountsError && <p className="mt-1 text-xs text-error-400">{quickAmountsError}</p>}
           <p className="mt-1 text-xs text-dark-500">
             {t('admin.paymentMethods.quickAmountsHint', {
-              defaults: (config.default_quick_amounts ?? [])
-                .map((kopeks) => kopeks / 100)
-                .join(', '),
+              defaults: (config.default_quick_amounts ?? []).map(catalogPriceInToman).join(', '),
             })}
           </p>
         </div>
