@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { CheckIcon, ChevronDownIcon, XCloseIcon, XIcon } from '@/components/icons';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { ADMIN_BALANCE_EDIT_MAX_TOMAN, bulkAddBalanceParams } from '@/utils/adminBalance';
 import { DropdownSelect } from './DropdownSelect';
 import type { UserListItem } from '../../../api/adminUsers';
 import type { TariffListItem } from '../../../api/tariffs';
@@ -192,7 +193,7 @@ export function ActionModal({
   const [days, setDays] = useState(30);
   const [tariffId, setTariffId] = useState<number>(tariffs[0]?.id ?? 0);
   const [trafficGb, setTrafficGb] = useState(10);
-  const [balanceRub, setBalanceRub] = useState(100);
+  const [balanceToman, setBalanceToman] = useState(50_000);
   const [promoGroupId, setPromoGroupId] = useState<number | null>(promoGroups[0]?.id ?? null);
   const [grantTariffId, setGrantTariffId] = useState<number>(tariffs[0]?.id ?? 0);
   const [grantDays, setGrantDays] = useState(30);
@@ -280,7 +281,7 @@ export function ActionModal({
         params.traffic_gb = trafficGb;
         break;
       case 'add_balance':
-        params.amount_kopeks = Math.round(balanceRub * 100);
+        Object.assign(params, bulkAddBalanceParams(balanceToman));
         break;
       case 'assign_promo_group':
         params.promo_group_id = promoGroupId;
@@ -359,14 +360,14 @@ export function ActionModal({
         return (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-dark-300">
-              {t('admin.bulkActions.params.balanceRub')}
+              {t('admin.bulkActions.params.balanceToman')}
             </label>
             <input
               type="number"
               min={1}
-              max={100000}
-              value={balanceRub}
-              onChange={(e) => setBalanceRub(Number(e.target.value))}
+              max={ADMIN_BALANCE_EDIT_MAX_TOMAN}
+              value={balanceToman}
+              onChange={(e) => setBalanceToman(Number(e.target.value))}
               className="w-full rounded-xl border border-dark-700 bg-dark-800 px-3 py-2.5 text-sm text-dark-100 outline-none transition-colors focus:border-accent-500/40"
             />
           </div>

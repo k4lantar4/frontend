@@ -2711,7 +2711,7 @@
         "days": "Number of days",
         "tariff": "Select tariff",
         "trafficGb": "Traffic amount (GB)",
-        "balanceRub": "Amount (RUB)",
+        "balanceToman": "Amount (Toman)",
         "promoGroup": "Promo group",
         "removePromoGroup": "Remove promo group",
         "deviceLimit": "Device count"

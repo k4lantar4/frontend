@@ -27,7 +27,10 @@ export interface BulkActionParams {
   days?: number;
   tariff_id?: number;
   traffic_gb?: number;
+  /** Legacy: raw balance storage amount (Toman 1:1). Use `amount_display` instead. */
   amount_kopeks?: number;
+  /** The typed Toman, credited 1:1 — the scale `users.balance_kopeks` is stored on. */
+  amount_display?: number;
   balance_description?: string;
   promo_group_id?: number | null;
   device_limit?: number;

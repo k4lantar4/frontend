@@ -4481,7 +4481,7 @@
         "days": "تعداد روز",
         "tariff": "انتخاب تعرفه",
         "trafficGb": "حجم ترافیک (GB)",
-        "balanceRub": "مبلغ (تومان)",
+        "balanceToman": "مبلغ (تومان)",
         "promoGroup": "گروه تبلیغاتی",
         "removePromoGroup": "حذف گروه تبلیغاتی",
         "deviceLimit": "تعداد دستگاه"

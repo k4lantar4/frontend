@@ -4702,7 +4702,7 @@
         "days": "Количество дней",
         "tariff": "Выберите тариф",
         "trafficGb": "Объём трафика (ГБ)",
-        "balanceRub": "Сумма (руб.)",
+        "balanceToman": "Сумма (томан)",
         "promoGroup": "Промогруппа",
         "removePromoGroup": "Убрать промогруппу",
         "deviceLimit": "Кол-во устройств"
