@@ -25,19 +25,24 @@ export const formatBytes = (bytes: number): string => {
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  return parseFloat((bytes / k ** i).toFixed(2)) + ' ' + sizes[i];
 };
 
 // Local wrapper over the shared helper so internal call sites keep
 // the (string) signature.
 export const getFlagEmoji = (countryCode: string): string => _sharedGetFlagEmoji(countryCode);
 
-export const formatCurrency = (kopeks: number): string => {
-  const rubles = kopeks / 100;
-  if (rubles === 0) return '0';
-  if (rubles < 10) return rubles.toFixed(2);
-  if (rubles < 1000) return Math.round(rubles).toString();
-  return `${(rubles / 1000).toFixed(1)}k`;
+/**
+ * Compact Toman for the traffic table's narrow "spent" column: 1.2k rather than 1,234.
+ *
+ * The argument is display Toman, not a scaled amount. The bot's `total_spent_toman` is a plain sum
+ * of Toman transactions since Phase C (remnabot revision 0115); the older `total_spent_kopeks`
+ * twin, which this used to divide by 100, is read through `tomanOrLegacy` at the call site.
+ */
+export const formatCompactToman = (toman: number): string => {
+  if (!Number.isFinite(toman) || toman === 0) return '0';
+  if (toman < 1000) return Math.round(toman).toString();
+  return `${(toman / 1000).toFixed(1)}k`;
 };
 
 export const formatShortDate = (iso: string | null): string => {

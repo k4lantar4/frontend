@@ -21,7 +21,7 @@ import { usePlatform } from '../platform/hooks/usePlatform';
 import {
   formatBytes,
   getFlagEmoji,
-  formatCurrency,
+  formatCompactToman,
   formatShortDate,
   toBackendSortField,
   bytesToGbPerDay,
@@ -32,6 +32,7 @@ import {
   getCompositeRisk,
   formatGbPerDay,
 } from '../components/admin/trafficUsage/trafficUsageHelpers';
+import { tomanOrLegacy } from '@/utils/balanceScale';
 import { RiskBadge } from '../components/admin/trafficUsage/RiskBadge';
 import { PeriodSelector, PERIODS } from '../components/admin/trafficUsage/filters/PeriodSelector';
 import { TariffFilter } from '../components/admin/trafficUsage/filters/TariffFilter';
@@ -515,11 +516,11 @@ export default function AdminTrafficUsage() {
         cell: ({ row }) => {
           const e = enrichment?.[row.original.user_id];
           if (enrichmentLoading && !enrichment) return cellSkeleton('w-12');
-          if (!e || e.total_spent_kopeks === 0)
-            return <span className="text-xs text-dark-300">{'\u2014'}</span>;
-          return (
-            <span className="text-xs text-dark-300">{formatCurrency(e.total_spent_kopeks)}</span>
-          );
+          const spentToman = e
+            ? tomanOrLegacy(e.total_spent_toman, e.total_spent_kopeks, 'catalog')
+            : 0;
+          if (!spentToman) return <span className="text-xs text-dark-300">{'\u2014'}</span>;
+          return <span className="text-xs text-dark-300">{formatCompactToman(spentToman)}</span>;
         },
       },
       {
