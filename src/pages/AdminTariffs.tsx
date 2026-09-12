@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { tariffsApi, type TariffListItem } from '../api/tariffs';
 import { useDestructiveConfirm, useNotify } from '@/platform';
 import { usePlatform } from '../platform/hooks/usePlatform';
+import { formatPrice } from '../utils/format';
 import {
   DndContext,
   KeyboardSensor,
@@ -119,8 +120,7 @@ function SortableTariffCard({
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-dark-400">
                 {tariff.is_daily && tariff.daily_price_kopeks > 0 && (
                   <span className="text-warning-400">
-                    {(tariff.daily_price_kopeks / 100).toFixed(2)}{' '}
-                    {t('admin.tariffs.currencyPerDay')}
+                    {formatPrice(tariff.daily_price_kopeks)} {t('subscription.tariff.perDay')}
                   </span>
                 )}
                 <span>
